@@ -1,0 +1,8 @@
+# LINE ENDINGS: LF in the repo AND on disk, matching LegendaryMissions.
+#
+# A .mast read out of a mastlib ZIP is read as BYTES, with no CRLF translation - and
+# on CRLF the label header rule stops matching, so a story compiles to NO LABELS and
+# still reports PASS. `git status` calls a CRLF tree clean; `git ls-files --eol` is
+# the honest check (`i/lf w/crlf` = mangled).
+* text=auto eol=lf
+*.png binary

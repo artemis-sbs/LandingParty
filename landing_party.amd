@@ -1,0 +1,364 @@
+# [The Landing Party](landing_party)
+
+Erebus Station has not answered in nineteen hours. It sits on the inner moon of the gas
+giant Kaleth, four people aboard, studying the cloud deck.
+
+Everything below is content. The mission script reacts to it and holds no story of its
+own: the cast becomes lifeforms, the scenes become the beats each console plays, and the
+four `signal` outcomes are the only things the script counts.
+
+The shape to keep if this is edited: **every location offers each character something
+only they can do, and nobody can take all four.** The story is legible only when the
+party puts its readings together, which is the whole reason it is played by four people
+at four consoles instead of one person with a menu.
+
+## [Away Team](team)
+
+The bodies on the ground. One per console. `Roles` is what the scene guards read, so
+every gated choice below names one of these words.
+
+### [Dr Sorel](sorel)
+---
+Face: terran_female
+Roles: away, medical
+Color: "#4cf"
+---
+Ship's surgeon. Reads bodies. Has signed more death certificates than she has opinions.
+
+### [Chief Ruiz](ruiz)
+---
+Face: terran_male
+Roles: away, engineering
+Color: "#fc4"
+---
+Engineer. Reads machines, and trusts them further than he trusts the people running them.
+
+### [Ensign Vale](vale)
+---
+Face: terran_male
+Roles: away, security
+Color: "#f66"
+---
+Security. Reads rooms. Youngest person on the team and the only one carrying anything.
+
+### [Lt Anders](anders)
+---
+Face: terran_fluid
+Roles: away, science
+Color: "#8f8"
+---
+Science officer. Reads records. Would rather be right slowly than first.
+
+## [Voices](voices)
+
+Not people on the team. These are voices the scenes may name without a body being spawned
+for them, because the mission builds lifeforms from `## Away Team` only.
+
+### [Erebus](outpost)
+---
+Face: terran_fluid
+Roles: narrator
+Color: "#aaa"
+---
+The station itself, and the flat voice of what you are looking at.
+
+### [Dr Haruki](haruki)
+---
+Face: terran_female
+Roles: narrator
+Color: "#fd8"
+---
+Senior researcher. Alive, in the shelter, and not sorry.
+
+## [Hails](hails)
+
+What arrives when the ship takes orbit. Beaming down is a DECISION the captain makes on
+the comms, not something that happens to the crew because they flew somewhere.
+
+The choices here are evaluated against the SHIP, not against an away character, so they
+carry no role guards - the per character menus start once the team is on the ground.
+
+### [Something Is Still Transmitting](orbit_call)
+---
+Speaker: outpost
+Title: Erebus Beacon
+Presentation: orbit
+Subject: gasgiant
+Color: "#aaa"
+---
+% Carrier only, on the survey band, cycling every ninety seconds. Under it there is about a second of voice.
+% It is too short to be a message and too regular to be an accident, and it has been doing this for nineteen hours.
+
+- [Clean it up and play it again](orbit_repeat)
+- [Assemble a landing party]()
+- [Hold position and keep scanning]()
+
+### [The Second Left of It](orbit_repeat)
+---
+Speaker: outpost
+Title: Erebus Beacon
+Presentation: orbit
+Subject: gasgiant
+Color: "#aaa"
+---
+% One voice, one word, and the word is "cold". Then the carrier again.
+% Whoever recorded it set it to repeat and then did not come back to say anything else.
+
+- [Assemble a landing party]()
+- [Hold position and keep scanning]()
+
+## [Scenes](away)
+
+Four locations, then a decision. At each location every character can read one thing, and
+what they read is theirs alone; the four readings only add up if the party says them out
+loud to each other.
+
+Four facts are worth having, and each can be reached more than one way, so no single route
+through the station is the correct one:
+
+| Signal | What the party now knows |
+|---|---|
+| `lp_cold` | The station is losing heat faster than it can make it. |
+| `lp_gentle` | It touches. It has not struck at anything. |
+| `lp_willing` | Nothing was forced. The crew opened every door themselves. |
+| `lp_sample` | It came up from the cloud deck, in a jar, logged as non motile. |
+
+Three of the four unlock the ending that is not a weapon.
+
+**Each fact is awarded in exactly two places, and no location gives more than two.** That
+is a balance, not an accident: a party has to move through the station rather than strip
+one room, and there is no single correct route. If a reading is moved, move its pair too.
+
+### [Entry Corridor](arrival)
+---
+Speaker: outpost
+---
+% The inner hatch stands open. The lights are down to their night cycle and nothing is moving.
+% Your breath is visible. That is the first thing anyone notices, and nobody says it yet.
+
+- [Kneel by the body at the hatch](arrival_med) if medical >= 1 ; signal lp_gentle
+- [Read the corridor thermals](arrival_eng) if engineering >= 1 ; signal lp_cold
+- [Check how this hatch was opened](arrival_sec) if security >= 1
+- [Pull the last transmission](arrival_sci) if science >= 1
+- [Move further in](lab)
+
+### [The Body at the Hatch](arrival_med)
+---
+Speaker: outpost
+---
+% Not a fall and not a weapon. The burn is contact, and it wraps the forearm the way a grip would.
+% Whatever held him was warm enough to blister the suit liner, and it held on for some time.
+
+- [Say it out loud](arrival)
+
+### [The Corridor Thermals](arrival_eng)
+---
+Speaker: outpost
+---
+% Four degrees, in a corridor rated for twenty. Every heater on this deck is at maximum.
+% They are not broken. They are losing, and they have been losing for most of a day.
+
+- [Say it out loud](arrival)
+
+### [The Hatch Mechanism](arrival_sec)
+---
+Speaker: outpost
+---
+% No cutting, no forcing, no override. The manual lever is thrown, from this side.
+% Somebody stood here, in the cold, and opened the door on purpose.
+
+- [Say it out loud](arrival)
+
+### [The Last Transmission](arrival_sci)
+---
+Speaker: outpost
+---
+% It stops between sentences, not between words. Nobody was interrupted.
+% The last thing Erebus said to anyone was that they would call back after the next observation.
+
+- [Say it out loud](arrival)
+
+### [The Sample Lab](lab)
+---
+Speaker: outpost
+---
+% Two workstations, both logged in. A jacket over a chair back. It is colder in here than the corridor.
+% The containment cabinet is open and the light inside it is still on.
+
+- [Examine the containment gel](lab_med) if medical >= 1
+- [Check why containment failed](lab_eng) if engineering >= 1 ; signal lp_willing
+- [Read the room](lab_sec) if security >= 1
+- [Pull the sample manifest](lab_sci) if science >= 1 ; signal lp_sample
+- [Go down to the reactor gallery](gallery)
+
+### [The Containment Gel](lab_med)
+---
+Speaker: outpost
+---
+% Body temperature, near enough, and it should be at minus forty. Something has been keeping it warm.
+% There are no cells in it. Nothing in this gel has ever divided.
+
+- [Say it out loud](lab)
+
+### [Why Containment Failed](lab_eng)
+---
+Speaker: outpost
+---
+% It did not fail. The field was switched off, from the panel, in the correct order, one interlock at a time.
+% Whoever did it took their time and did it properly.
+
+- [Say it out loud](lab)
+
+### [Reading the Lab](lab_sec)
+---
+Speaker: outpost
+---
+% No overturned chair, no dropped tools, nothing thrown. Two cups of coffee, both stone cold, both nearly full.
+% Nobody in this room was ever in a hurry.
+
+- [Say it out loud](lab)
+
+### [The Sample Manifest](lab_sci)
+---
+Speaker: outpost
+---
+% Recovered from the cloud deck at nine hundred millibars. Mass, four kilograms. Classification, non motile.
+% Somebody has written a question mark beside the classification, in pencil, some time later.
+
+- [Say it out loud](lab)
+
+### [Reactor Gallery](gallery)
+---
+Speaker: outpost
+---
+% It is wrapped around the coolant loop, three decks of it, and it is the colour of a bruise under ice.
+% It knows you are here. Nothing about it moves toward you.
+
+- [Watch it breathe](gallery_med) if medical >= 1
+- [Read the coolant loop](gallery_eng) if engineering >= 1 ; signal lp_cold
+- [Hold the doorway and watch it](gallery_sec) if security >= 1
+- [Match it against the cloud deck survey](gallery_sci) if science >= 1 ; signal lp_sample
+- [Go up to the shelter](shelter)
+
+### [Watching It Breathe](gallery_med)
+---
+Speaker: outpost
+---
+% There is a rhythm in it, slow and getting slower, and you have seen that rhythm before in things that were failing.
+% If this is dying, it is dying of cold, in the warmest room on the station.
+
+- [Say it out loud](gallery)
+
+### [The Coolant Loop](gallery_eng)
+---
+Speaker: outpost
+---
+% The loop is running backwards. It is not venting heat, it is being drained of it, and the reactor is answering by burning harder.
+% At this rate the station has about four hours of fuel and then it has none.
+
+- [Say it out loud](gallery)
+
+### [Holding the Doorway](gallery_sec)
+---
+Speaker: outpost
+---
+% You have stood in the open for ninety seconds. It has had ninety seconds.
+% Whatever it did to the man at the hatch, it is not doing to you, and it could.
+
+- [Say it out loud](gallery)
+
+### [The Cloud Deck Survey](gallery_sci)
+---
+Speaker: outpost
+---
+% Same spectrum as the sample, and the same as the band it was lifted from. This is not a thing that came here.
+% This is a thing that was brought here, and the pressure it likes is a hundred kilometres below your boots.
+
+- [Say it out loud](gallery)
+
+### [The Shelter](shelter)
+---
+Speaker: haruki
+---
+% Three of us. We have been in here since it got out, and we are not hiding from it.
+% We are keeping out of its way, which is a different thing, and I would like somebody to write that down correctly.
+
+- [Examine the survivors](shelter_med) if medical >= 1
+- [Ask what they routed the power to](shelter_eng) if engineering >= 1
+- [Check how this door was secured](shelter_sec) if security >= 1 ; signal lp_willing
+- [Ask Haruki what she thinks it is](shelter_sci) if science >= 1 ; signal lp_gentle
+- [Decide what to do](decide)
+
+### [The Survivors](shelter_med)
+---
+Speaker: outpost
+---
+% Hypothermic, all three, and the youngest is badly so. Not one of them is burned.
+% They have been losing heat for a day and none of them has been touched.
+
+- [Say it out loud](shelter)
+
+### [Where the Power Went](shelter_eng)
+---
+Speaker: haruki
+---
+% Every watt we could spare, into the heater in the far cabin, and then we shut the door on it.
+% Not a trap. Somewhere warm that is not where the people are. It went, and it stayed.
+
+- [Say it out loud](shelter)
+
+### [The Shelter Door](shelter_sec)
+---
+Speaker: outpost
+---
+% Barricaded from inside, with lockers, in a hurry. The lock itself was never engaged.
+% They built a wall they could climb over and left the door unlocked behind it.
+
+- [Say it out loud](shelter)
+
+### [Haruki's Answer](shelter_sci)
+---
+Speaker: haruki
+---
+% It followed the heat. Every time. Never the people, and we were the warmest things in the room for the first hour.
+% Marchetti got in the way of the heat, at the hatch. That is all that happened to Marchetti.
+
+- [Say it out loud](shelter)
+
+### [What We Do](decide)
+---
+Speaker: outpost
+---
+% Four hours of fuel, three people who cannot take another cold night, and a thing on the coolant loop that has not once come at you.
+% Whatever gets decided in this corridor is going in somebody's report.
+
+- [Vent the gallery and open the flue to the cloud deck](ending_home) if briefed >= 1 ; signal lp_end_home
+- [Burn it off the coolant loop](ending_burn) ; signal lp_end_burn
+- [Ask the survivors what they want](decide_ask)
+
+### [Asking the Survivors](decide_ask)
+---
+Speaker: haruki
+---
+% You are asking the wrong question and you are asking it of the wrong people. Ask what it is doing, not what it is.
+% We have had a day to work that out and we did not manage it either, so I would not be proud of the delay.
+
+- [Back to it](decide)
+
+### [The Long Way Down](ending_home)
+---
+Speaker: outpost
+---
+% You cut the gallery open to the sky and let the pressure fall, and it goes, the way water goes down a drain, unhurried.
+% Ninety kilometres below, the cloud deck takes it back. The heaters catch up by morning. Haruki writes down what it did, correctly.
+
+- [Beam back up]()
+
+### [The Short Way](ending_burn)
+---
+Speaker: outpost
+---
+% It comes off the loop in about forty seconds and it does not fight at any point during them.
+% The station is warm again by the end of the watch. Nobody in the shelter says anything to you, and Haruki files her own report.
+
+- [Beam back up]()

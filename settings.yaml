@@ -1,0 +1,28 @@
+DIFFICULTY: 5
+PLAYER_COUNT: 1
+PLAYER_CREATE_DEFAULT: true
+PLAYER_SHIP_RESPAWN: false
+EPADD_ENABLED: true
+
+# Seconds after map start to beam down WITHOUT taking orbit. 0 = off, which is the game;
+# a headless --test sets it so the away half is actually exercised.
+LP_AUTO_BEAM: 0
+
+PLAYER_LIST:
+    -   name: "Artemis"
+        side: "tsn"
+        ship: "tsn_light_cruiser"
+        face: "terran"
+    -   name: "Intrepid"
+        side: "tsn"
+        ship: "tsn_battle_cruiser"
+        face: "terran"
+
+DOCKING:
+    refuel_amount: 20
+    refuel_delay: 2
+    shield_delay: 2
+    shield_coeff: 2
+    torps_delay: 6
+    interior_delay: 2
+    interior_count: 2

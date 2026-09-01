@@ -1,0 +1,5 @@
+map body running
+orbit: body=4611686018427387910, hailing
+orbit hail answered: Assemble a landing party
+beam down: scene=arrival cast=4
+finish: ending=burn facts=['gentle']

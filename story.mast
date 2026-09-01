@@ -1,0 +1,270 @@
+# The Landing Party
+#
+# Erebus Station has not answered in nineteen hours. Take orbit at Kaleth, beam a
+# four person team down, and find out why.
+#
+# THE SHAPE. This file holds no story. Every word the players read lives in
+# `landing_party.amd`; the script's whole job is to spawn the world, notice the orbit,
+# hand each console a character, and count four signals. If a beat needs changing,
+# change the AMD.
+#
+# THE DIVISION. The main screen carries the shared view and takes no character - one
+# person's menu on everybody's screen is not a shared view. Every other console becomes
+# somebody, and comes back to its own station when the scene closes.
+
+
+# Three of the four readings unlock the ending that is not a weapon. Deliberately not
+# all four: the party should be able to reach it by more than one route through the
+# station, or "explore everything" becomes the only correct play.
+default shared LP_FACTS_NEEDED = 3
+# Beat between taking orbit and the transporter, so the orbit is a moment rather than a
+# loading screen.
+default shared LP_BEAM_DELAY = 6
+# Beam down on a timer instead of on the orbit. Headless nobody flies, so the away half
+# of the mission would never be reached by `--test` and every scene, guard and ending
+# would go unexercised while the run still reported PASS. 0 = off, which is the game.
+# Read from SETTINGS in the map body - see the note there.
+# Where Kaleth sits. The players spawn at Erebus and fly out to it.
+default shared LP_GIANT_X = 0
+default shared LP_GIANT_Y = 0
+default shared LP_GIANT_Z = 22000
+
+
+#region sides
+lp_tsn = await prefab_spawn(prefab_side_generic, data={"key":"tsn", "name": "TSN", "color": "#07F", "desc":"The Terran Stellar Navy"})
+lp_raider = await prefab_spawn(prefab_side_generic, data={"key":"raider", "name": "Raider", "color": "#F00", "desc":"Salvage crews, and worse"})
+side_set_relations(lp_tsn, lp_raider, sbs.DIPLOMACY.HOSTILE)
+#endregion
+
+@media/music/default "Cosmos Default Music"
+@media/skybox/sky-bored-alice "borealis"
+
+
+@map/landing_party "The Landing Party"
+metadata: ``` yaml
+Properties:
+    Player Ships: 'gui_int_slider("$text:int;low: 1.0;high:8.0;", var= "PLAYER_COUNT")'
+    Difficulty: 'gui_int_slider("$text:int;low: 1.0;high:11.0;", var= "DIFFICULTY")'
+Defaults:
+    CREW_SELECT: landing_crew
+```
+    " A research station has gone quiet. Take orbit, beam down, and read the room.
+
+    # `logger(file=...)` attaches its file handler ONLY when FrameContext.task is set, so
+    # it must be called from MAST - from script.py the task is None and the handler is
+    # silently never added, which is why a named log category "goes nowhere".
+    logger(name="landing", file="landing.txt")
+    log("map body running", "landing")
+    # Records every overlay command and every clear, so "the overlay did not go away" can
+    # be answered with what was actually on the console instead of a guess.
+    overlay_debug_log()
+
+    # A cast, so every console arrives already being somebody. By: console auto assigns.
+    crew_load_amd("landing_crew.amd")
+    shared CREW_SELECT = "landing_crew"
+
+    # The away module answers `if medical >= 1` by looking at the answering character's
+    # ROLES. It COMPOSES with whatever resolver is already installed rather than
+    # replacing it, so calling it is safe even beside another mod that wants one.
+    away_metric_install()
+
+    lp_doc = document_get_amd_file(get_mission_dir_filename("landing_party.amd"), data_parser=amd_mission_data)
+    shared LP_SCENES = dialogue_scenes(amd_section(lp_doc, "away"))
+    shared LP_HAILS = dialogue_scenes(amd_section(lp_doc, "hails"))
+    shared LP_CAST = lifeforms_spawn(amd_section(lp_doc, "team"))
+    # What the party has worked out. Set HERE rather than at the top level so a second
+    # run of the map starts the story over instead of inheriting the last crew's notes.
+    shared LP_FACTS = []
+    shared LP_ENDING = None
+
+    #region the system
+    await prefab_spawn(prefab_gas_giant, data={
+        "name": "Kaleth",
+        "planet_radius": 4000,
+        "START_X": LP_GIANT_X, "START_Y": LP_GIANT_Y, "START_Z": LP_GIANT_Z})
+    # ASK THE WORLD, do not trust the return. `prefab_gas_giant` ends in `->END` with no
+    # `yield result`, so `await prefab_spawn(...)` hands back None - and `to_id(None)` is
+    # None, which then silently never equals anything. That is what stopped the beam down:
+    # the orbit fired, the route compared the body against None, and bailed. Only some
+    # prefabs yield a result; a role query is true for all of them.
+    shared LP_GIANT_ID = next(iter(role("gasgiant")), None)
+
+    # Say so if the body is missing. Without the giant there is no orbit, so there is no
+    # away mission at all - and the way that failed was in total silence.
+    if LP_GIANT_ID is None:
+        print("LandingParty: no gasgiant spawned - the orbit can never fire")
+
+    lp_erebus = npc_spawn(0, 0, 0, "Erebus Station", "tsn, station", "starbase_civil", "behav_station")
+    shared LP_EREBUS_ID = to_id(lp_erebus)
+    #endregion
+
+    await task_schedule(spawn_players)
+    await task_schedule(docking_standard_player_gas_giant)
+
+    # Science can read the station from here. That is the point of the bridge half: the
+    # people who can SEE are not the people who can ACT.
+    for lp_ship in to_object_list(role("__player__")):
+        link(lp_ship.id, "extra_scan_source", LP_EREBUS_ID)
+        if LP_GIANT_ID is not None:
+            link(lp_ship.id, "extra_scan_source", LP_GIANT_ID)
+
+    game_end_condition_add(destroyed_all(role("__player__")), "All ships lost. Erebus is still cold.", False)
+
+    task_schedule(lp_picket)
+    # settings_get_defaults(), not a bare `default shared`: settings.yaml, a profile and
+    # the headless COSMOS_SETTINGS override all feed the SETTINGS table, and none of them
+    # seeds a MAST shared variable - so a `default shared` flag reads its own default
+    # forever and the override looks ignored.
+    lp_settings = settings_get_defaults()
+    lp_auto = lp_settings.get("LP_AUTO_BEAM", 0)
+    ->END if lp_auto is None or lp_auto <= 0
+
+    # Development only. Reaching the away half without an orbit, so a headless run can
+    # walk the scenes.
+    await delay_sim(lp_auto)
+    signal_emit("lp_beam_down")
+    ->END
+
+
+# Somebody is already here, and it is not a rescue. Small on purpose - this mission is
+# not a fleet action, and a picket that wipes the bridge never gets to the story.
+=== lp_picket
+    await delay_sim(20)
+    lp_fleet_pos = Vec3.rand_in_sphere(8000, 14000, False, True)
+    lp_fleet_data = ~~{"race": "skaraan", "fleet_difficulty": int(max(0, DIFFICULTY - 3)), "START_X": lp_fleet_pos.x, "START_Y": lp_fleet_pos.y, "START_Z": lp_fleet_pos.z}~~
+    prefab_spawn(prefab_fleet_raider, lp_fleet_data)
+    ->END
+
+
+#############################################################################
+# Routes. These live at the END of the file: labels fall through, routes do not,
+# so anything added above this line must not run on into them.
+#############################################################################
+
+# Taking orbit is the away mission's starting gun. The library deliberately hands out
+# nothing but the orbit and lets the mission decide what it means.
+//shared/signal/ship_orbiting
+    ->END if away_is_open()
+    # The ROLE, not an id. It survives the giant being respawned or a second body being
+    # added later, and it does not depend on a prefab handing anything back.
+    ->END if not has_role(ORBIT_BODY_ID, "gasgiant")
+    # ONE hail per arrival. `//shared/signal` is once per EMIT, not once per mission, and
+    # the docking brain re-fires ship_orbiting on a re-approach.
+    ->END if get_inventory_value(ORBIT_SHIP_ID, "LP_HAILED", False)
+    set_inventory_value(ORBIT_SHIP_ID, "LP_HAILED", True)
+    log(f"orbit: body={ORBIT_BODY_ID}, hailing", "landing")
+
+    # Beaming down is a DECISION, not a consequence of flying somewhere. The hail is
+    # awaitable and server arbitrated, so with six consoles the answer still fires once.
+    lp_call = await hail_ask(ORBIT_SHIP_ID, scene="orbit_call", scenes=LP_HAILS)
+    ->END if lp_call is None
+    log(f"orbit hail answered: {lp_call.value}", "landing")
+    if lp_call.value == "Assemble a landing party":
+        await delay_sim(LP_BEAM_DELAY)
+        signal_emit("lp_beam_down")
+    else:
+        # Not now. Re-arm, so leaving orbit and coming back offers the call again rather
+        # than stranding the mission on one declined hail.
+        set_inventory_value(ORBIT_SHIP_ID, "LP_HAILED", False)
+    ->END
+
+
+# //shared/signal, not //signal: this hands out characters and opens the scene, and with
+# six consoles a //signal body would do every bit of that six times over.
+//shared/signal/lp_beam_down
+    ->END if LP_SCENES is None or LP_CAST is None
+    ->END if away_is_open()
+    lp_ship = next(iter(role("__player__")), None)
+    ->END if lp_ship is None
+    lp_roster = list(LP_CAST.values())
+    ->END if len(lp_roster) == 0
+
+    # Open the beat BEFORE anybody can be looking at it, so the first build already has
+    # a line to draw.
+    away_scene_begin(LP_SCENES, "arrival", speaker="outpost")
+
+    # OFFER the party rather than deal it. Nobody moves until a console opens Away Team
+    # on its ePADD and chooses somebody - a crew member should not find themselves on a
+    # planet playing whoever a loop reached. The consoles that stay behind simply stay
+    # at their posts, which also ends the old choice between doubling consoles up and
+    # stranding characters nobody could play.
+    away_invite(lp_ship, lp_roster, title="The Outpost")
+
+    # The old hand-over, for a bridge running without ePADD: it deals and morphs, as it
+    # always did. Harmless beside the invitation - whoever it seats is simply no longer
+    # on the open roster.
+    if not gui_app_mode_is_on():
+        lp_hand_over = ~~{"AWAY_SHIP": lp_ship, "AWAY_ROSTER": lp_roster}~~
+        signal_emit("away_begin", lp_hand_over)
+
+    log(f"beam down: scene={away_scene()} cast={len(lp_roster)}", "landing")
+    ->END
+
+
+# The four readings. One route each rather than one route with a token, because a
+# `signal` outcome carries no data - the NAME is the whole message.
+//shared/signal/lp_cold
+    task_schedule(lp_learn, {"lp_fact": "cold"})
+    ->END
+
+//shared/signal/lp_gentle
+    task_schedule(lp_learn, {"lp_fact": "gentle"})
+    ->END
+
+//shared/signal/lp_willing
+    task_schedule(lp_learn, {"lp_fact": "willing"})
+    ->END
+
+//shared/signal/lp_sample
+    task_schedule(lp_learn, {"lp_fact": "sample"})
+    ->END
+
+
+# Record one reading, and open the other ending once enough of them are in.
+#
+# `briefed` is a ROLE on the away characters rather than a new metric, so the guard in
+# the AMD (`if briefed >= 1`) is answered by the resolver the away module already
+# installed. No second resolver, and none of the composition risk that comes with one.
+=== lp_learn
+    ->END if lp_fact in LP_FACTS
+    LP_FACTS.append(lp_fact)
+    ->END if len(LP_FACTS) < LP_FACTS_NEEDED
+    for lp_body in to_object_list(away_team()):
+        add_role(lp_body, "briefed")
+    ->END
+
+
+//shared/signal/lp_end_home
+    LP_ENDING = "home"
+    task_schedule(lp_finish)
+    ->END
+
+//shared/signal/lp_end_burn
+    LP_ENDING = "burn"
+    task_schedule(lp_finish)
+    ->END
+
+
+# End the mission, but not until the team is actually back. The ending is CHOSEN while
+# the away scene is still open, and tearing the game down under a console that is still
+# painting the last beat means nobody reads the end of their own story.
+=== lp_finish
+    await delay_sim(1)
+    jump lp_finish if away_is_open()
+    # And a beat after that, so the consoles have rebuilt on the bridge first.
+    await delay_sim(3)
+
+    if LP_ENDING == "home":
+        START_TEXT = "Erebus is warm again, and the thing that was on the coolant loop is ninety kilometres down where it belongs. Three survivors, and a record of what it was."
+        # The sting comes out of the bank that is PLAYING, so a game scored to anything
+        # other than the stock soundtrack still ends on its own music.
+        music_play_sting("victory")
+    else:
+        START_TEXT = "Erebus is warm again. Three survivors, a clean coolant loop, and no record of what any of it was."
+        music_play_sting("victory")
+
+    GAME_STARTED = False
+    GAME_ENDED = True
+    log(f"finish: ending={LP_ENDING} facts={LP_FACTS}", "landing")
+    signal_emit("show_game_results", None)
+    ->END

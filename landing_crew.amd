@@ -1,0 +1,51 @@
+# [Landing Party Rosters](landing_rosters)
+
+The bridge crew of the ship that answers the call. Separate from the away team: a crew
+post is a label on a seat occupied by a human, and the away character is a body in the
+world. This file is the first; `landing_party.amd` is the second.
+
+Kept in its own file on purpose. `crew_load_amd` parses with `amd_crew_data` and the
+story content is read with `amd_mission_data`; one file read by two parsers is a trap.
+
+## [Erebus Watch](landing_crew)
+---
+crew
+Race: terran
+---
+The watch that happened to be on when the relay stopped answering.
+
+### [Cmdr Idris Vane](vane)
+---
+Rank: Commander
+Console: mainscreen
+---
+
+### [Lt Anh Ferro](ferro)
+---
+Rank: Lieutenant
+Console: comms
+---
+
+### [Lt Mira Okonkwo](okonkwo)
+---
+Rank: Lieutenant
+Console: helm
+---
+
+### [Ens Petra Lund](lund)
+---
+Rank: Ensign
+Console: weapons
+---
+
+### [Lt Sam Reyes](reyes)
+---
+Rank: Lieutenant
+Console: science
+---
+
+### [CPO Dana Kovac](kovac)
+---
+Rank: Chief
+Console: engineering
+---
