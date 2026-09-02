@@ -188,7 +188,19 @@ Defaults:
     # planet playing whoever a loop reached. The consoles that stay behind simply stay
     # at their posts, which also ends the old choice between doubling consoles up and
     # stranding characters nobody could play.
-    away_invite(lp_ship, lp_roster, title="The Outpost")
+    #
+    # THE PARTY IS THE CREW when the bridge has one. You go down as the person you have
+    # been all evening, and each console has its own place held - so beaming down is a
+    # confirmation rather than a casting call. A console that never picked a crew
+    # member is assigned one on the way, the way the picker would have.
+    lp_invite = away_invite_crew(lp_ship, title="The Outpost")
+    lp_derived = len(lp_invite.get("roster") or []) > 0
+
+    # No crew at all: fall back to the cast this mission authored. It is a deliberate
+    # cast, with its own faces and job words, so it is the right answer whenever there
+    # is nobody at the consoles to derive a party from.
+    if not lp_derived:
+        away_invite(lp_ship, lp_roster, title="The Outpost")
 
     # The old hand-over, for a bridge running without ePADD: it deals and morphs, as it
     # always did. Harmless beside the invitation - whoever it seats is simply no longer
@@ -197,7 +209,8 @@ Defaults:
         lp_hand_over = ~~{"AWAY_SHIP": lp_ship, "AWAY_ROSTER": lp_roster}~~
         signal_emit("away_begin", lp_hand_over)
 
-    log(f"beam down: scene={away_scene()} cast={len(lp_roster)}", "landing")
+    log(f"beam down: scene={away_scene()} crew={lp_derived} cast={len(lp_roster)}",
+        "landing")
     ->END
 
 

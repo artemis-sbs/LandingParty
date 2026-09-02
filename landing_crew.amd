@@ -1,8 +1,17 @@
 # [Landing Party Rosters](landing_rosters)
 
-The bridge crew of the ship that answers the call. Separate from the away team: a crew
-post is a label on a seat occupied by a human, and the away character is a body in the
-world. This file is the first; `landing_party.amd` is the second.
+The bridge crew of the ship that answers the call - and, when the call takes them down
+to the surface, the landing party as well. You go down as the person you have been all
+evening rather than as a stranger off a list, so this file is the cast for both.
+`landing_party.amd` still holds the hand-authored bodies, used when nobody is manning
+the consoles at all.
+
+`Roles:` is what an away scene GUARDS on - `if security`, `if medical`. A post without
+one falls back to the console it names, so Reyes at science satisfies `if science` and
+Kovac at engineering satisfies `if engineering` with nothing written here. Only a job
+whose name is not its seat needs saying out loud, which is why weapons carries
+`security` and nothing carries `medical`: this watch has no medic, and the medic's
+lines are forwarded to whoever is covering rather than lost.
 
 Kept in its own file on purpose. `crew_load_amd` parses with `amd_crew_data` and the
 story content is read with `amd_mission_data`; one file read by two parsers is a trap.
@@ -36,6 +45,7 @@ Console: helm
 ---
 Rank: Ensign
 Console: weapons
+Roles: security
 ---
 
 ### [Lt Sam Reyes](reyes)
