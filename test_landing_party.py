@@ -34,7 +34,7 @@ from sbs_utils.procedural.amd_mission import amd_mission_data
 from sbs_utils.procedural.amd import amd_choice
 from sbs_utils.procedural.roles import add_role
 from sbs_utils.spaceobject import SpaceObject
-from sbs_utils.procedural import away as A
+from sbs_utils.procedural import boarding as A
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -56,10 +56,10 @@ class LandingPartyContent(unittest.TestCase):
         # filename as a document and yields an empty one, in silence.
         with open(os.path.join(HERE, "landing_party.amd"), encoding="utf-8") as fh:
             doc = amd_document(fh.read(), data_parser=amd_mission_data)
-        self.scenes = dialogue_scenes(amd_section(doc, "away"))
+        self.scenes = dialogue_scenes(amd_section(doc, "boarding"))
         self.cast = lifeforms_spawn(amd_section(doc, "team"))
-        A.away_clear()
-        A.away_metric_install()
+        A.boarding_clear()
+        A.boarding_metric_install()
 
     def _authored(self, scene_key):
         """Every choice as WRITTEN, guards and all.
@@ -73,10 +73,10 @@ class LandingPartyContent(unittest.TestCase):
         return [c for c in (amd_choice(line) for line in body.splitlines()) if c]
 
     def _choices_for(self, scene_key, member_key):
-        A.away_scene_begin(self.scenes, scene_key, speaker="outpost")
+        A.boarding_scene_begin(self.scenes, scene_key, speaker="outpost")
         cid = 0x8000000000000001
-        A.away_assign(cid, self.cast[member_key])
-        return A.away_choices(cid)
+        A.boarding_assign(cid, self.cast[member_key])
+        return A.boarding_choices(cid)
 
     # --- the graph ----------------------------------------------------------
 
@@ -106,7 +106,7 @@ class LandingPartyContent(unittest.TestCase):
         # never beam up - which is exactly how the probe's first cut stranded everybody.
         closers = [k for k in self.scenes
                    if any(not (c.get("target") or "").strip() for c in self._authored(k))]
-        self.assertTrue(closers, "no scene closes; the away team can never come back")
+        self.assertTrue(closers, "no scene closes; the boarding party can never come back")
 
     # --- the per-character menus, which are the whole feature ----------------
 
@@ -172,7 +172,7 @@ class LandingPartyContent(unittest.TestCase):
 
     def test_briefing_the_team_reveals_it(self):
         # What the mission does once three distinct readings are in: a ROLE on the
-        # characters, so the guard is answered by the resolver away_metric_install put in
+        # characters, so the guard is answered by the resolver boarding_metric_install put in
         # rather than by a second one this mission would have to compose by hand.
         for member in self.cast.values():
             add_role(member, "briefed")

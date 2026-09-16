@@ -66,10 +66,10 @@ Defaults:
     # The away module answers `if medical >= 1` by looking at the answering character's
     # ROLES. It COMPOSES with whatever resolver is already installed rather than
     # replacing it, so calling it is safe even beside another mod that wants one.
-    away_metric_install()
+    boarding_metric_install()
 
     lp_doc = document_get_amd_file(get_mission_dir_filename("landing_party.amd"), data_parser=amd_mission_data)
-    shared LP_SCENES = dialogue_scenes(amd_section(lp_doc, "away"))
+    shared LP_SCENES = dialogue_scenes(amd_section(lp_doc, "boarding"))
     shared LP_HAILS = dialogue_scenes(amd_section(lp_doc, "hails"))
     shared LP_CAST = lifeforms_spawn(amd_section(lp_doc, "team"))
     # What the party has worked out. Set HERE rather than at the top level so a second
@@ -144,7 +144,7 @@ Defaults:
 # Taking orbit is the away mission's starting gun. The library deliberately hands out
 # nothing but the orbit and lets the mission decide what it means.
 //shared/signal/ship_orbiting
-    ->END if away_is_open()
+    ->END if boarding_is_open()
     # The ROLE, not an id. It survives the giant being respawned or a second body being
     # added later, and it does not depend on a prefab handing anything back.
     ->END if not has_role(ORBIT_BODY_ID, "gasgiant")
@@ -173,7 +173,7 @@ Defaults:
 # six consoles a //signal body would do every bit of that six times over.
 //shared/signal/lp_beam_down
     ->END if LP_SCENES is None or LP_CAST is None
-    ->END if away_is_open()
+    ->END if boarding_is_open()
     lp_ship = next(iter(role("__player__")), None)
     ->END if lp_ship is None
     lp_roster = list(LP_CAST.values())
@@ -181,9 +181,9 @@ Defaults:
 
     # Open the beat BEFORE anybody can be looking at it, so the first build already has
     # a line to draw.
-    away_scene_begin(LP_SCENES, "arrival", speaker="outpost")
+    boarding_scene_begin(LP_SCENES, "arrival", speaker="outpost")
 
-    # OFFER the party rather than deal it. Nobody moves until a console opens Away Team
+    # OFFER the party rather than deal it. Nobody moves until a console opens Boarding Party
     # on its ePADD and chooses somebody - a crew member should not find themselves on a
     # planet playing whoever a loop reached. The consoles that stay behind simply stay
     # at their posts, which also ends the old choice between doubling consoles up and
@@ -193,23 +193,31 @@ Defaults:
     # been all evening, and each console has its own place held - so beaming down is a
     # confirmation rather than a casting call. A console that never picked a crew
     # member is assigned one on the way, the way the picker would have.
-    lp_invite = away_invite_crew(lp_ship, title="The Outpost")
+    lp_invite = boarding_invite_crew(lp_ship, title="The Outpost")
     lp_derived = len(lp_invite.get("roster") or []) > 0
 
     # No crew at all: fall back to the cast this mission authored. It is a deliberate
     # cast, with its own faces and job words, so it is the right answer whenever there
     # is nobody at the consoles to derive a party from.
     if not lp_derived:
-        away_invite(lp_ship, lp_roster, title="The Outpost")
+        boarding_invite(lp_ship, lp_roster, title="The Outpost")
 
-    # The old hand-over, for a bridge running without ePADD: it deals and morphs, as it
-    # always did. Harmless beside the invitation - whoever it seats is simply no longer
-    # on the open roster.
-    if not gui_app_mode_is_on():
-        lp_hand_over = ~~{"AWAY_SHIP": lp_ship, "AWAY_ROSTER": lp_roster}~~
-        signal_emit("away_begin", lp_hand_over)
+    # The old hand-over, for a bridge running the LEGACY crew console: it deals and
+    # morphs, as it always did. Harmless beside the invitation - whoever it seats is
+    # simply no longer on the open roster.
+    #
+    # Gated on the SAME setting the addon's consumer is gated on
+    # (`//shared/signal/boarding_begin if SETTINGS.get("BOARDING_LEGACY_CONSOLE")`), so
+    # the emit and the route agree. It used to ask `gui_app_mode_is_on()`, which the
+    # library DELETED when ePADD became always-on - so every beam-down raised
+    # `NameError: gui_app_mode_is_on is not defined` and the mission reported FAIL.
+    # Pre-existing since this mission's first commit; nothing caught it because a
+    # vanished MAST global fails at runtime, not at compile.
+    if SETTINGS.get("BOARDING_LEGACY_CONSOLE", False):
+        lp_hand_over = ~~{"BOARDING_SHIP": lp_ship, "BOARDING_ROSTER": lp_roster}~~
+        signal_emit("boarding_begin", lp_hand_over)
 
-    log(f"beam down: scene={away_scene()} crew={lp_derived} cast={len(lp_roster)}",
+    log(f"beam down: scene={boarding_scene()} crew={lp_derived} cast={len(lp_roster)}",
         "landing")
     ->END
 
@@ -242,7 +250,7 @@ Defaults:
     ->END if lp_fact in LP_FACTS
     LP_FACTS.append(lp_fact)
     ->END if len(LP_FACTS) < LP_FACTS_NEEDED
-    for lp_body in to_object_list(away_team()):
+    for lp_body in to_object_list(boarding_team()):
         add_role(lp_body, "briefed")
     ->END
 
@@ -263,7 +271,7 @@ Defaults:
 # painting the last beat means nobody reads the end of their own story.
 === lp_finish
     await delay_sim(1)
-    jump lp_finish if away_is_open()
+    jump lp_finish if boarding_is_open()
     # And a beat after that, so the consoles have rebuilt on the bridge first.
     await delay_sim(3)
 

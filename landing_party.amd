@@ -12,7 +12,7 @@ only they can do, and nobody can take all four.** The story is legible only when
 party puts its readings together, which is the whole reason it is played by four people
 at four consoles instead of one person with a menu.
 
-## [Away Team](team)
+## [Boarding Party](team)
 
 The bodies on the ground. One per console. `Roles` is what the scene guards read, so
 every gated choice below names one of these words.
@@ -20,7 +20,7 @@ every gated choice below names one of these words.
 ### [Dr Sorel](sorel)
 ---
 Face: terran_female
-Roles: away, medical
+Roles: boarding, medical
 Color: "#4cf"
 ---
 Ship's surgeon. Reads bodies. Has signed more death certificates than she has opinions.
@@ -28,7 +28,7 @@ Ship's surgeon. Reads bodies. Has signed more death certificates than she has op
 ### [Chief Ruiz](ruiz)
 ---
 Face: terran_male
-Roles: away, engineering
+Roles: boarding, engineering
 Color: "#fc4"
 ---
 Engineer. Reads machines, and trusts them further than he trusts the people running them.
@@ -36,7 +36,7 @@ Engineer. Reads machines, and trusts them further than he trusts the people runn
 ### [Ensign Vale](vale)
 ---
 Face: terran_male
-Roles: away, security
+Roles: boarding, security
 Color: "#f66"
 ---
 Security. Reads rooms. Youngest person on the team and the only one carrying anything.
@@ -44,7 +44,7 @@ Security. Reads rooms. Youngest person on the team and the only one carrying any
 ### [Lt Anders](anders)
 ---
 Face: terran_fluid
-Roles: away, science
+Roles: boarding, science
 Color: "#8f8"
 ---
 Science officer. Reads records. Would rather be right slowly than first.
@@ -52,7 +52,7 @@ Science officer. Reads records. Would rather be right slowly than first.
 ## [Voices](voices)
 
 Not people on the team. These are voices the scenes may name without a body being spawned
-for them, because the mission builds lifeforms from `## Away Team` only.
+for them, because the mission builds lifeforms from `## Boarding Party` only.
 
 ### [Erebus](outpost)
 ---
@@ -75,7 +75,7 @@ Senior researcher. Alive, in the shelter, and not sorry.
 What arrives when the ship takes orbit. Beaming down is a DECISION the captain makes on
 the comms, not something that happens to the crew because they flew somewhere.
 
-The choices here are evaluated against the SHIP, not against an away character, so they
+The choices here are evaluated against the SHIP, not against a boarding character, so they
 carry no role guards - the per character menus start once the team is on the ground.
 
 ### [Something Is Still Transmitting](orbit_call)
@@ -90,7 +90,7 @@ Color: "#aaa"
 % It is too short to be a message and too regular to be an accident, and it has been doing this for nineteen hours.
 
 - [Clean it up and play it again](orbit_repeat)
-- [Assemble a landing party]()
+- [Assemble a boarding party]()
 - [Hold position and keep scanning]()
 
 ### [The Second Left of It](orbit_repeat)
@@ -104,10 +104,10 @@ Color: "#aaa"
 % One voice, one word, and the word is "cold". Then the carrier again.
 % Whoever recorded it set it to repeat and then did not come back to say anything else.
 
-- [Assemble a landing party]()
+- [Assemble a boarding party]()
 - [Hold position and keep scanning]()
 
-## [Scenes](away)
+## [Scenes](boarding)
 
 Four locations, then a decision. At each location every character can read one thing, and
 what they read is theirs alone; the four readings only add up if the party says them out
