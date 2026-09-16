@@ -1,2 +1,5 @@
 **/__pycache__/**
 *.log
+
+# The probe report the mission writes on every run - generated, not source.
+landing.txt
