@@ -96,6 +96,19 @@ Defaults:
 
     lp_erebus = npc_spawn(0, 0, 0, "Erebus Station", "tsn, station", "starbase_civil", "behav_station")
     shared LP_EREBUS_ID = to_id(lp_erebus)
+
+    # EREBUS IS A PLACE YOU WALK, not only a place you talk to. The floor plan names its
+    # rooms for the scenes they open - `arrival`, `lab`, `gallery`, `shelter` - so the
+    # station and `landing_party.amd` share one vocabulary and nothing has to map between
+    # them. `starbase_civil` has no stock interior, which is why a plan is authored at all.
+    lp_plan = media_read_relative_file("erebus.grid")
+    if lp_plan is not None:
+        grid_merge_ascii(lp_plan, "LandingParty", "starbase_civil")
+        boarding_site_build(lp_erebus, layout="erebus")
+        # Rooms start noticing. What entering one MEANS is this mission's business, and
+        # it is the route at the end of this file.
+        boarding_rooms_watch()
+        log(f"erebus interior: {len(grid_objects(LP_EREBUS_ID))} grid objects", "landing")
     #endregion
 
     await task_schedule(spawn_players)
@@ -193,14 +206,17 @@ Defaults:
     # been all evening, and each console has its own place held - so beaming down is a
     # confirmation rather than a casting call. A console that never picked a crew
     # member is assigned one on the way, the way the picker would have.
-    lp_invite = boarding_invite_crew(lp_ship, title="The Outpost")
+    # `site=` is the whole of the spatial half at this end. The shipped BEAM DOWN button
+    # reads it off the invitation, so each console that goes down also gets a body on the
+    # station and the crew console that draws it - without this mission touching the app.
+    lp_invite = boarding_invite_crew(lp_ship, title="The Outpost", site=LP_EREBUS_ID)
     lp_derived = len(lp_invite.get("roster") or []) > 0
 
     # No crew at all: fall back to the cast this mission authored. It is a deliberate
     # cast, with its own faces and job words, so it is the right answer whenever there
     # is nobody at the consoles to derive a party from.
     if not lp_derived:
-        boarding_invite(lp_ship, lp_roster, title="The Outpost")
+        boarding_invite(lp_ship, lp_roster, title="The Outpost", site=LP_EREBUS_ID)
 
     # The old hand-over, for a bridge running the LEGACY crew console: it deals and
     # morphs, as it always did. Harmless beside the invitation - whoever it seats is
@@ -288,4 +304,28 @@ Defaults:
     GAME_ENDED = True
     log(f"finish: ending={LP_ENDING} facts={LP_FACTS}", "landing")
     signal_emit("show_game_results", None)
+    ->END
+
+
+#############################################################################
+# WALKING INTO A ROOM IS ARRIVING IN A SCENE.
+#
+# The floor plan names its rooms for the scene keys in landing_party.amd, so this
+# is the whole join: the room you entered IS the beat to open. No lookup table, and
+# adding a room to the station is adding a location to the story.
+#
+# `//shared/signal`, not `//signal`: walking into the lab is one event in the world.
+# On a plain //signal route a four-console party would open the beat four times and
+# re-roll its line three of them.
+#############################################################################
+
+//shared/signal/boarding_entered
+    # A room the story has nothing to say about - a junction, a corridor somebody named -
+    # is just somewhere to stand. Not an error, and not worth a log line.
+    ->END if LP_SCENES is None
+    ->END if BOARDING_ROOM_NAME not in LP_SCENES
+    # Already here. Re-opening would re-roll the line the party is reading.
+    ->END if boarding_scene() == BOARDING_ROOM_NAME
+    boarding_scene_begin(LP_SCENES, BOARDING_ROOM_NAME, speaker="outpost")
+    log(f"walked into {BOARDING_ROOM_NAME}", "landing")
     ->END
