@@ -24,6 +24,13 @@ default shared LP_BEAM_DELAY = 6
 # of the mission would never be reached by `--test` and every scene, guard and ending
 # would go unexercised while the run still reported PASS. 0 = off, which is the game.
 # Read from SETTINGS in the map body - see the note there.
+# THE TWO ANSWERS TO THE ORBIT CALL, spelled exactly as `landing_party.amd` offers them
+# (`### [Something Is Still Transmitting](orbit_call)`). A hail resolves with the chosen
+# LABEL, so these are authored text quoted in a second file; keeping them here means there
+# is ONE copy, and the route below says so out loud when an answer matches neither.
+default shared LP_ACCEPT = "Assemble a boarding party"
+default shared LP_DECLINE = "Hold position and keep scanning"
+
 # Where Kaleth sits. The players spawn at Erebus and fly out to it.
 default shared LP_GIANT_X = 0
 default shared LP_GIANT_Y = 0
@@ -172,10 +179,27 @@ Defaults:
     lp_call = await hail_ask(ORBIT_SHIP_ID, scene="orbit_call", scenes=LP_HAILS)
     ->END if lp_call is None
     log(f"orbit hail answered: {lp_call.value}", "landing")
-    if lp_call.value == "Assemble a landing party":
+
+    # MATCHED AGAINST THE .amd, NOT AGAINST A REMEMBERED PHRASE. `hail_ask` resolves with
+    # the chosen LABEL, so this comparison is a copy of authored text living in a second
+    # file - and when the away addon became the boarding addon, `landing_party.amd` was
+    # renamed to "Assemble a boarding party" and this line was not. It then matched
+    # nothing: the else branch re-armed the hail, no party was ever offered, and because
+    # `boarding_relevant()` correctly hides the tile when there is no party, the whole
+    # failure surfaced as "the ePADD has no Boarding Party app". Nothing raised, nothing
+    # logged, and the hail echo said "answered" - the last place anybody would look.
+    #
+    # `LP_ACCEPT` is now the only copy, it sits beside nothing else, and the mismatch is
+    # LOUD: an answer that is neither authored choice says so in landing.txt instead of
+    # falling quietly into "not now".
+    if lp_call.value == LP_ACCEPT:
         await delay_sim(LP_BEAM_DELAY)
         signal_emit("lp_beam_down")
     else:
+        if lp_call.value is not None and lp_call.value != LP_DECLINE:
+            log(f"UNKNOWN orbit answer {lp_call.value!r} - it matches neither "
+                f"{LP_ACCEPT!r} nor {LP_DECLINE!r}, so nobody will ever beam down. "
+                f"landing_party.amd and story.mast have drifted.", "landing", "warning")
         # Not now. Re-arm, so leaving orbit and coming back offers the call again rather
         # than stranding the mission on one declined hail.
         set_inventory_value(ORBIT_SHIP_ID, "LP_HAILED", False)

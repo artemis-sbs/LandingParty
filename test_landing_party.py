@@ -186,5 +186,116 @@ class LandingPartyContent(unittest.TestCase):
                           "a party that understood nothing still has to be able to act")
 
 
+class TheOrbitCallIsTHEDOOR(unittest.TestCase):
+    """The one answer that starts the mission, matched against the words it is offered in.
+
+    `hail_ask` resolves with the chosen LABEL, so `story.mast` holds a copy of text that
+    lives in `landing_party.amd`. When the away addon became the boarding addon the AMD
+    was renamed to "Assemble a boarding party" and the comparison in story.mast was not -
+    so it matched nothing, the else branch re-armed the hail, no party was ever offered,
+    and because `boarding_relevant()` correctly hides the tile when there is no party the
+    whole failure surfaced on a bridge as **"the ePADD has no Boarding Party app"**.
+
+    Nothing raised. Nothing logged. The hail echo said "answered". `--test` passed,
+    because LP_AUTO_BEAM skips this route entirely - which is precisely why the one line
+    that has to agree between two files needs a test of its own.
+    """
+
+    SCENES = ("orbit_call", "orbit_repeat")
+
+    @classmethod
+    def setUpClass(cls):
+        with open(os.path.join(HERE, "landing_party.amd"), encoding="utf-8") as fh:
+            doc = amd_document(fh.read(), data_parser=amd_mission_data)
+        cls.hails = dialogue_scenes(amd_section(doc, "hails"))
+        with open(os.path.join(HERE, "story.mast"), encoding="utf-8") as fh:
+            cls.story = fh.read()
+
+    def authored(self, scene_key):
+        # `amd_choice` answers a dict here and an object elsewhere in this file, because
+        # the two sections are parsed by different callers. Read either.
+        body = self.hails[scene_key].get("description") or ""
+        out = []
+        for line in body.splitlines():
+            c = amd_choice(line)
+            if not c:
+                continue
+            out.append(c.get("label") if isinstance(c, dict) else c.label)
+        return out
+
+    def declared(self, name):
+        """The literal story.mast compares against, read out of the source."""
+        import re
+        m = re.search(r'^default shared %s = "([^"]*)"' % name, self.story, re.M)
+        self.assertIsNotNone(m, f"story.mast no longer declares {name}")
+        return m.group(1)
+
+    def test_the_scenes_exist_at_all(self):
+        for key in self.SCENES:
+            with self.subTest(scene=key):
+                self.assertIn(key, self.hails)
+
+    def test_ACCEPT_IS_A_CHOICE_THE_AMD_ACTUALLY_OFFERS(self):
+        """The regression, in one line."""
+        accept = self.declared("LP_ACCEPT")
+        for key in self.SCENES:
+            with self.subTest(scene=key):
+                self.assertIn(accept, self.authored(key))
+
+    def test_decline_is_too(self):
+        decline = self.declared("LP_DECLINE")
+        for key in self.SCENES:
+            with self.subTest(scene=key):
+                self.assertIn(decline, self.authored(key))
+
+    def test_they_are_different_answers(self):
+        self.assertNotEqual(self.declared("LP_ACCEPT"), self.declared("LP_DECLINE"))
+
+    def authored_pairs(self, scene_key):
+        """(label, target) for every choice, so a BRANCH can be told from an answer."""
+        body = self.hails[scene_key].get("description") or ""
+        out = []
+        for line in body.splitlines():
+            c = amd_choice(line)
+            if not c:
+                continue
+            if isinstance(c, dict):
+                out.append((c.get("label"), c.get("target")))
+            else:
+                out.append((c.label, getattr(c, "target", None)))
+        return out
+
+    def test_every_answer_that_ENDS_the_call_is_one_the_route_handles(self):
+        """A THIRD answer added to the AMD is a silent dead end: it falls into the else
+        branch and quietly re-arms, which is this same failure wearing a hat.
+
+        A choice that carries a TARGET is not one of those - it walks the conversation on
+        to another scene, and the hail system handles it. That distinction is load
+        bearing: `[Clean it up and play it again](orbit_repeat)` used to settle the
+        awaiting story anyway, so the route ended there and the real answer, one screen
+        later, reached nobody. The library no longer settles on a branch."""
+        known = {self.declared("LP_ACCEPT"), self.declared("LP_DECLINE")}
+        for key in self.SCENES:
+            with self.subTest(scene=key):
+                endings = {label for label, target in self.authored_pairs(key)
+                           if not target}
+                self.assertEqual(endings, known)
+
+    def test_every_branch_points_at_a_scene_that_exists(self):
+        """And a branch to a scene nobody wrote is not a branch at all - it falls through
+        as an ENDING, with a label the route has never heard of."""
+        for key in self.SCENES:
+            for label, target in self.authored_pairs(key):
+                if not target:
+                    continue
+                with self.subTest(scene=key, choice=label):
+                    self.assertIn(target, self.hails,
+                                  f"{label!r} walks to {target!r}, which is not a scene")
+
+    def test_the_route_compares_against_the_constant_not_a_literal(self):
+        """If somebody inlines the phrase again, this whole class stops protecting it."""
+        self.assertIn("lp_call.value == LP_ACCEPT", self.story)
+
+
 if __name__ == "__main__":
     unittest.main()
