@@ -17,7 +17,7 @@ LP_CHECK_MODE: dice
 LP_SEED: 0
 
 # Art sets drawn over the mission's own `builtin` art, in order (see sbs_utils
-# tilemap_art.py). `frontier` is in the Cosmos-Tiles-Frontier media pack; without the pack the
+# tilemap_art.py). `frontier` is the Cosmos-Tiles frontier pack; without the pack the
 # builtin art is used.
 TILE_ART: frontier
 
