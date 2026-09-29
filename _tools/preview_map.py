@@ -151,6 +151,12 @@ def main():
             key = T.tilemap_cell_look(spec, x, y, args.area)
             if key in sprites:
                 img.alpha_composite(scaled(key, 1, 1), ((x - x0) * T_PX, (y - y0) * T_PX))
+    # Fringes over the ground, before anything stands on it - as the view sends them.
+    for y in range(y0, y0 + h):
+        for x in range(x0, x0 + w):
+            for key in T.tilemap_cell_fringes(args.area, x, y):
+                if key in sprites:
+                    img.alpha_composite(scaled(key, 1, 1), ((x - x0) * T_PX, (y - y0) * T_PX))
 
     things = placements(args.area)
     colors = ["#4cf", "#fc4", "#f66", "#8f8", "#c8f", "#fa8"]
