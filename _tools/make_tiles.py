@@ -1,12 +1,20 @@
-"""Generate the tile atlas for Mereth: media/lp_tiles.png, 16x8 cells of 128 px.
+"""Generate Dawnline's BUILTIN art set: media/tileart/builtin/ (sheet.png + manifest.json).
+
+The mission names shared keys only (`fig:crew_eva`, `prop:hauler`, ground looks like
+`dirt`); an art set
+says what they look like, and a media pack can redraw any of them (see
+`sbs_utils/procedural/tilemap_art.py`). This is the set the mission always has, so it runs
+with no pack installed: every key the mission uses must be here.
 
 Procedural stand-in art, drawn well enough to read at a glance: tileable ground in a few
 variants per kind (so a field does not repeat in a grid), shaded top-down figures and
 props with a drop shadow, lit from the top left, and the hint badges the map draws over
 anything still worth a look. Everything is drawn at 4x and shrunk, so edges are smooth.
 
-The ORDER of cells comes from `lp_world.py` (LP_TILE_NAMES), read without importing it,
-so the atlas and the mission can never disagree about which cell is which.
+KEYS below is the whole set: each logical key -> the drawing it uses (several keys may
+share one: every named colonist is the colonist figure with a tint of its own), and
+GROUND says which keys dress which tile kind. The packer lays the drawings out and writes
+the manifest, so nothing else keeps positions in step.
 
 Two rules the engine imposes:
 * A figure is TINTED by multiplying (crew get a color each), so anything tinted is drawn
@@ -16,7 +24,7 @@ Two rules the engine imposes:
 
 Dev tool: needs Pillow and numpy.  python _tools/make_tiles.py
 """
-import ast
+import json
 import math
 import os
 import random
@@ -26,22 +34,13 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-OUT = os.path.join(ROOT, "media", "lp_tiles.png")
-COLS, ROWS = 16, 8
+OUT_DIR = os.path.join(ROOT, "media", "tileart", "builtin")
+COLS = 16
 C = 128                 # cell, in the atlas
 S = 4                   # supersampling
 B = C * S               # cell, while drawing
 LIGHT = np.array([-0.45, -0.55, 0.70])
 LIGHT = LIGHT / np.linalg.norm(LIGHT)
-
-
-def tile_names():
-    """LP_TILE_NAMES from lp_world.py, by reading its source."""
-    src = open(os.path.join(ROOT, "lp_world.py"), encoding="utf-8").read()
-    for node in ast.walk(ast.parse(src)):
-        if isinstance(node, ast.Assign) and getattr(node.targets[0], "id", "") == "LP_TILE_NAMES":
-            return ast.literal_eval(node.value)
-    raise SystemExit("LP_TILE_NAMES not found in lp_world.py")
 
 
 # --- noise and color -------------------------------------------------------------------
@@ -854,19 +853,97 @@ def draw_cell(name):
     raise SystemExit("no drawing for tile %r" % name)
 
 
+# --- the set -------------------------------------------------------------------------
+
+#: Ground drawings -> how many looks (variant n is drawing "<drawing>_v<n>").
+VARIANTS = {"dust": 3, "scrub": 3, "salt": 3, "path": 2, "floor": 2, "cave": 3,
+            "rock": 3, "brine": 2}
+
+#: The shared ground LOOK names (what the mission's kinds wear, see lp_world.lp_kinds)
+#: -> the drawing that stands in for each in this builtin set.
+GROUND_LOOKS = {
+    "dirt": "dust", "dirt_grass": "scrub", "salt": "salt", "sand_pale": "path",
+    "floor_metal": "floor", "floor_grate": "deck", "rock_floor": "cave",
+    "stone_tiles": "glyphfloor", "vent": "vent", "rock": "rock", "cliff": "cliff",
+    "water": "brine", "crystal": "crystal", "wall_metal": "wall",
+    "wall_ancient": "pwall", "hull_metal": "hull", "exit": "exit", "lava": "heat",
+}
+
+#: Shared key -> drawing, or (drawing, tint). The same vocabulary every Cosmos tile pack
+#: uses (fig: people, prop: things, ui: badges), so a pack can redraw any of it and
+#: anything a pack leaves out still has a picture here.
+KEYS = {
+    # people
+    "fig:crew_eva": "crew", "fig:crew_f": "survivor", "fig:crew_m": "colonist",
+    "fig:captain_f": ("colonist", "#fd8"), "fig:captain_m": ("colonist", "#fd8"),
+    "fig:junker_m": ("colonist", "#f96"), "fig:junker_f": "colonist",
+    "fig:medic_m": "survivor", "fig:soldier_m": ("colonist", "#9ab"),
+    "fig:soldier_f": ("colonist", "#9ab"), "fig:hunter_f": "colonist",
+    "fig:skaraan": "skaraan", "fig:skaraan_young": "youngster",
+    "fig:skaraan_chief": "vhesk", "fig:alien": "skaraan", "fig:glassback": "glassback",
+    "fig:robot_war": "sentinel", "fig:robot_f": "sentinel",
+    # things, and their other states
+    "prop:survey_marker": "marker", "prop:survey_marker_lit": "marker_set",
+    "prop:crate": "crate", "prop:crate_medical": "medkit", "prop:hatch": "door_shut",
+    "prop:doorframe": "door_open", "prop:terminal": "terminal", "prop:console": "console",
+    "prop:machine_part": "part", "prop:beacon": "marker", "prop:beacon_lit": "marker_set",
+    "prop:rubble": "rockfall", "prop:rubble_cleared": "path",
+    "prop:crystal_seam": "crystal", "prop:crystal_seam_mined": "cave",
+    "prop:drone_wreck": "drone", "prop:tent": "tent", "prop:tent_b": "tent",
+    "prop:keycard": "key", "prop:scanner": "datapad", "prop:bones": "bones",
+    "prop:bag": "drop", "prop:sample_tube": "sample", "prop:bed": "bed",
+    "prop:hauler": "hauler", "prop:antenna_dish": "marker", "prop:obelisk": "panel",
+    "prop:glyph_panel": "panel", "prop:pedestal": "pedestal",
+    "prop:pedestal_lit": "pedestal_lit", "prop:ancient_console": "console",
+    "prop:vault_door": "door_shut", "prop:vault_door_open": "glyphfloor",
+    # hint badges
+    "ui:hint_new": "hint_new", "ui:hint_lead": "hint_lead", "ui:hint_way": "hint_way",
+}
+
+
+def build_set():
+    """(drawings in sheet order, sprites {key: (drawing, tint)}, ground {kind: look})."""
+    sprites, ground = {}, {}
+    for name, drawing in GROUND_LOOKS.items():
+        n_looks = VARIANTS.get(drawing, 1)
+        looks = ["ground:%s" % name if n == 1 else "ground:%s_v%d" % (name, n)
+                 for n in range(1, n_looks + 1)]
+        for n, key in enumerate(looks, 1):
+            sprites[key] = (drawing if n == 1 else "%s_v%d" % (drawing, n), None)
+        ground[name] = {"cell": looks[0]}
+        if len(looks) > 1:
+            ground[name]["variants"] = looks[1:]
+    for key, what in KEYS.items():
+        drawing, tint = (what, None) if isinstance(what, str) else what
+        sprites[key] = (drawing, tint)
+    drawings = []
+    for drawing, _ in sprites.values():
+        if drawing not in drawings:
+            drawings.append(drawing)
+    return drawings, sprites, ground
+
+
 def main():
-    names = tile_names()
-    if len(names) > COLS * ROWS:
-        raise SystemExit("%d names, atlas holds %d" % (len(names), COLS * ROWS))
-    atlas = Image.new("RGBA", (COLS * C, ROWS * C), (0, 0, 0, 0))
-    for i, name in enumerate(names):
-        if name is None:            # a deliberately empty cell (rows start clean)
-            continue
-        cell = draw_cell(name).resize((C, C), Image.LANCZOS)
-        atlas.paste(cell, ((i % COLS) * C, (i // COLS) * C))
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    atlas.save(OUT, optimize=True)
-    print("wrote", OUT, len(names), "cells", os.path.getsize(OUT), "bytes")
+    drawings, sprites, ground = build_set()
+    rows = (len(drawings) + COLS - 1) // COLS
+    sheet = Image.new("RGBA", (COLS * C, rows * C), (0, 0, 0, 0))
+    rects = {}
+    for i, name in enumerate(drawings):
+        x, y = (i % COLS) * C, (i // COLS) * C
+        sheet.paste(draw_cell(name).resize((C, C), Image.LANCZOS), (x, y))
+        rects[name] = [x, y, x + C, y + C]
+    manifest = {"sheets": {"sheet": "sheet.png"}, "sprites": {}, "ground": ground}
+    for key, (drawing, tint) in sorted(sprites.items()):
+        entry = {"sheet": "sheet", "rect": rects[drawing]}
+        if tint:
+            entry["color"] = tint
+        manifest["sprites"][key] = entry
+    os.makedirs(OUT_DIR, exist_ok=True)
+    sheet.save(os.path.join(OUT_DIR, "sheet.png"), optimize=True)
+    with open(os.path.join(OUT_DIR, "manifest.json"), "w", encoding="utf-8", newline="\n") as f:
+        json.dump(manifest, f, indent=1, sort_keys=True)
+        f.write("\n")
+    print("wrote", OUT_DIR, len(drawings), "drawings,", len(sprites), "keys")
 
 
 if __name__ == "__main__":

@@ -14,12 +14,16 @@ hail, the power hail, the ending screen). Those need `--test` and the engine.
 
 Run: PYTHONPATH=../sbs_utils python -m unittest test_landing_party
 """
+import json
 import os
 import sys
 import unittest
 
 from sbs_utils.fs import test_set_exe_dir
 test_set_exe_dir()
+# The MISSION folder is this one: art sets are found under its media/ (tilemap_art).
+import sbs_utils.fs as _fs
+_fs.script_dir = os.path.dirname(os.path.abspath(__file__))
 
 import cosmos_dev.mock.sbs as mock_sbs
 sys.modules.setdefault("sbs", mock_sbs)
@@ -53,6 +57,12 @@ ENG, SCI, SEC, COM = (0x8000000000000101, 0x8000000000000102,
                       0x8000000000000103, 0x8000000000000104)
 CREW = ((ENG, "CPO Dana Kovac", "engineering"), (SCI, "Lt Sam Reyes", "science"),
         (SEC, "Ens Petra Lund", "security"), (COM, "Lt Anh Ferro", "comms"))
+
+
+def _builtin_manifest():
+    with open(os.path.join(HERE, "media", "tileart", "builtin", "manifest.json"),
+              encoding="utf-8") as fh:
+        return json.load(fh)
 
 
 def _read(name):
@@ -199,12 +209,47 @@ class TestTheContentResolves(World):
         self.assertEqual(boarding_hints(ENG, "ridge").get((drone[1], drone[2])), "new")
         self.assertIn("way", boarding_hints(ENG, "ridge").values())
 
-    def test_every_tile_name_has_a_cell_in_the_atlas(self):
+    def test_THE_BUILTIN_ART_DRAWS_EVERY_KEY_THE_MISSION_NAMES(self):
+        """A pack is optional, so a key only a pack draws would be a blank figure for
+        everyone without it."""
+        builtin = _builtin_manifest()["sprites"]
+        used = {"fig:crew_eva", "prop:bag", "ui:hint_new", "ui:hint_lead", "ui:hint_way"}
+        for section in ("props", "people", "hostiles"):
+            for n in amd_section(self.world, section).get("children", []):
+                d = n.get("data") or {}
+                used.update(v for v in (d.get("sprite"), d.get("open_sprite")) if v)
+        self.assertEqual(sorted(k for k in used if k not in builtin), [])
+
+    def test_every_ground_kind_has_a_look(self):
+        for kind, spec in T._TILESETS["mereth"].items():
+            self.assertTrue(spec.get("cell"), f"tile kind {kind} has no art")
+
+    def test_every_rect_lies_on_its_sheet(self):
         from PIL import Image
-        img = Image.open(os.path.join(HERE, "media", "lp_tiles.png"))
-        _, cols, rows, cell = L.LP_ATLAS
-        self.assertEqual(img.size, (cols * cell, rows * cell))
-        self.assertLessEqual(len(L.LP_TILE_NAMES), cols * rows)
+        for name in os.listdir(os.path.join(HERE, "media", "tileart")):
+            folder = os.path.join(HERE, "media", "tileart", name)
+            with open(os.path.join(folder, "manifest.json"), encoding="utf-8") as fh:
+                m = json.load(fh)
+            sizes = {k: Image.open(os.path.join(folder, v)).size
+                     for k, v in m["sheets"].items()}
+            for w, h in sizes.values():
+                self.assertLessEqual(max(w, h), 4096, f"{name}: sheet too big")
+            for key, spec in m["sprites"].items():
+                w, h = sizes[spec["sheet"]]
+                l, t, r, b = spec["rect"]
+                self.assertTrue(0 <= l < r <= w and 0 <= t < b <= h, f"{name}: {key}")
+
+    def test_the_builtin_art_always_loads_first(self):
+        from sbs_utils.procedural.tilemap_art import tilemap_art_loaded
+        self.assertEqual(tilemap_art_loaded()[0], "builtin")
+
+    def test_without_the_pack_the_builtin_art_draws_it_all(self):
+        from sbs_utils.procedural.tilemap_art import tilemap_art_origin, tilemap_art_clear
+        tilemap_art_clear()
+        L.lp_setup_tiles("builtin")
+        self.assertEqual(tilemap_art_origin("fig:crew_eva"), "builtin")
+        for kind, spec in T._TILESETS["mereth"].items():
+            self.assertTrue(spec.get("cell"), f"tile kind {kind} has no art")
 
     def test_every_choice_goes_somewhere_real(self):
         for key, node in list(self.scenes.items()) + list(self.hails.items()):

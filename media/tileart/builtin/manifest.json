@@ -1,0 +1,862 @@
+{
+ "ground": {
+  "cliff": {
+   "cell": "ground:cliff"
+  },
+  "crystal": {
+   "cell": "ground:crystal"
+  },
+  "dirt": {
+   "cell": "ground:dirt",
+   "variants": [
+    "ground:dirt_v2",
+    "ground:dirt_v3"
+   ]
+  },
+  "dirt_grass": {
+   "cell": "ground:dirt_grass",
+   "variants": [
+    "ground:dirt_grass_v2",
+    "ground:dirt_grass_v3"
+   ]
+  },
+  "exit": {
+   "cell": "ground:exit"
+  },
+  "floor_grate": {
+   "cell": "ground:floor_grate"
+  },
+  "floor_metal": {
+   "cell": "ground:floor_metal",
+   "variants": [
+    "ground:floor_metal_v2"
+   ]
+  },
+  "hull_metal": {
+   "cell": "ground:hull_metal"
+  },
+  "lava": {
+   "cell": "ground:lava"
+  },
+  "rock": {
+   "cell": "ground:rock",
+   "variants": [
+    "ground:rock_v2",
+    "ground:rock_v3"
+   ]
+  },
+  "rock_floor": {
+   "cell": "ground:rock_floor",
+   "variants": [
+    "ground:rock_floor_v2",
+    "ground:rock_floor_v3"
+   ]
+  },
+  "salt": {
+   "cell": "ground:salt",
+   "variants": [
+    "ground:salt_v2",
+    "ground:salt_v3"
+   ]
+  },
+  "sand_pale": {
+   "cell": "ground:sand_pale",
+   "variants": [
+    "ground:sand_pale_v2"
+   ]
+  },
+  "stone_tiles": {
+   "cell": "ground:stone_tiles"
+  },
+  "vent": {
+   "cell": "ground:vent"
+  },
+  "wall_ancient": {
+   "cell": "ground:wall_ancient"
+  },
+  "wall_metal": {
+   "cell": "ground:wall_metal"
+  },
+  "water": {
+   "cell": "ground:water",
+   "variants": [
+    "ground:water_v2"
+   ]
+  }
+ },
+ "sheets": {
+  "sheet": "sheet.png"
+ },
+ "sprites": {
+  "fig:alien": {
+   "rect": [
+    256,
+    256,
+    384,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "fig:captain_f": {
+   "color": "#fd8",
+   "rect": [
+    128,
+    256,
+    256,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "fig:captain_m": {
+   "color": "#fd8",
+   "rect": [
+    128,
+    256,
+    256,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "fig:crew_eva": {
+   "rect": [
+    1920,
+    128,
+    2048,
+    256
+   ],
+   "sheet": "sheet"
+  },
+  "fig:crew_f": {
+   "rect": [
+    0,
+    256,
+    128,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "fig:crew_m": {
+   "rect": [
+    128,
+    256,
+    256,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "fig:glassback": {
+   "rect": [
+    640,
+    256,
+    768,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "fig:hunter_f": {
+   "rect": [
+    128,
+    256,
+    256,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "fig:junker_f": {
+   "rect": [
+    128,
+    256,
+    256,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "fig:junker_m": {
+   "color": "#f96",
+   "rect": [
+    128,
+    256,
+    256,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "fig:medic_m": {
+   "rect": [
+    0,
+    256,
+    128,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "fig:robot_f": {
+   "rect": [
+    768,
+    256,
+    896,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "fig:robot_war": {
+   "rect": [
+    768,
+    256,
+    896,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "fig:skaraan": {
+   "rect": [
+    256,
+    256,
+    384,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "fig:skaraan_chief": {
+   "rect": [
+    512,
+    256,
+    640,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "fig:skaraan_young": {
+   "rect": [
+    384,
+    256,
+    512,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "fig:soldier_f": {
+   "color": "#9ab",
+   "rect": [
+    128,
+    256,
+    256,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "fig:soldier_m": {
+   "color": "#9ab",
+   "rect": [
+    128,
+    256,
+    256,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "ground:cliff": {
+   "rect": [
+    768,
+    128,
+    896,
+    256
+   ],
+   "sheet": "sheet"
+  },
+  "ground:crystal": {
+   "rect": [
+    1152,
+    128,
+    1280,
+    256
+   ],
+   "sheet": "sheet"
+  },
+  "ground:dirt": {
+   "rect": [
+    0,
+    0,
+    128,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:dirt_grass": {
+   "rect": [
+    384,
+    0,
+    512,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:dirt_grass_v2": {
+   "rect": [
+    512,
+    0,
+    640,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:dirt_grass_v3": {
+   "rect": [
+    640,
+    0,
+    768,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:dirt_v2": {
+   "rect": [
+    128,
+    0,
+    256,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:dirt_v3": {
+   "rect": [
+    256,
+    0,
+    384,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:exit": {
+   "rect": [
+    1664,
+    128,
+    1792,
+    256
+   ],
+   "sheet": "sheet"
+  },
+  "ground:floor_grate": {
+   "rect": [
+    1664,
+    0,
+    1792,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:floor_metal": {
+   "rect": [
+    1408,
+    0,
+    1536,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:floor_metal_v2": {
+   "rect": [
+    1536,
+    0,
+    1664,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:hull_metal": {
+   "rect": [
+    1536,
+    128,
+    1664,
+    256
+   ],
+   "sheet": "sheet"
+  },
+  "ground:lava": {
+   "rect": [
+    1792,
+    128,
+    1920,
+    256
+   ],
+   "sheet": "sheet"
+  },
+  "ground:rock": {
+   "rect": [
+    384,
+    128,
+    512,
+    256
+   ],
+   "sheet": "sheet"
+  },
+  "ground:rock_floor": {
+   "rect": [
+    1792,
+    0,
+    1920,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:rock_floor_v2": {
+   "rect": [
+    1920,
+    0,
+    2048,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:rock_floor_v3": {
+   "rect": [
+    0,
+    128,
+    128,
+    256
+   ],
+   "sheet": "sheet"
+  },
+  "ground:rock_v2": {
+   "rect": [
+    512,
+    128,
+    640,
+    256
+   ],
+   "sheet": "sheet"
+  },
+  "ground:rock_v3": {
+   "rect": [
+    640,
+    128,
+    768,
+    256
+   ],
+   "sheet": "sheet"
+  },
+  "ground:salt": {
+   "rect": [
+    768,
+    0,
+    896,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:salt_v2": {
+   "rect": [
+    896,
+    0,
+    1024,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:salt_v3": {
+   "rect": [
+    1024,
+    0,
+    1152,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:sand_pale": {
+   "rect": [
+    1152,
+    0,
+    1280,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:sand_pale_v2": {
+   "rect": [
+    1280,
+    0,
+    1408,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:stone_tiles": {
+   "rect": [
+    128,
+    128,
+    256,
+    256
+   ],
+   "sheet": "sheet"
+  },
+  "ground:vent": {
+   "rect": [
+    256,
+    128,
+    384,
+    256
+   ],
+   "sheet": "sheet"
+  },
+  "ground:wall_ancient": {
+   "rect": [
+    1408,
+    128,
+    1536,
+    256
+   ],
+   "sheet": "sheet"
+  },
+  "ground:wall_metal": {
+   "rect": [
+    1280,
+    128,
+    1408,
+    256
+   ],
+   "sheet": "sheet"
+  },
+  "ground:water": {
+   "rect": [
+    896,
+    128,
+    1024,
+    256
+   ],
+   "sheet": "sheet"
+  },
+  "ground:water_v2": {
+   "rect": [
+    1024,
+    128,
+    1152,
+    256
+   ],
+   "sheet": "sheet"
+  },
+  "prop:ancient_console": {
+   "rect": [
+    1792,
+    256,
+    1920,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:antenna_dish": {
+   "rect": [
+    896,
+    256,
+    1024,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:bag": {
+   "rect": [
+    768,
+    384,
+    896,
+    512
+   ],
+   "sheet": "sheet"
+  },
+  "prop:beacon": {
+   "rect": [
+    896,
+    256,
+    1024,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:beacon_lit": {
+   "rect": [
+    1024,
+    256,
+    1152,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:bed": {
+   "rect": [
+    1024,
+    384,
+    1152,
+    512
+   ],
+   "sheet": "sheet"
+  },
+  "prop:bones": {
+   "rect": [
+    640,
+    384,
+    768,
+    512
+   ],
+   "sheet": "sheet"
+  },
+  "prop:console": {
+   "rect": [
+    1792,
+    256,
+    1920,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:crate": {
+   "rect": [
+    1152,
+    256,
+    1280,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:crate_medical": {
+   "rect": [
+    1280,
+    256,
+    1408,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:crystal_seam": {
+   "rect": [
+    1152,
+    128,
+    1280,
+    256
+   ],
+   "sheet": "sheet"
+  },
+  "prop:crystal_seam_mined": {
+   "rect": [
+    1792,
+    0,
+    1920,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "prop:doorframe": {
+   "rect": [
+    1536,
+    256,
+    1664,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:drone_wreck": {
+   "rect": [
+    128,
+    384,
+    256,
+    512
+   ],
+   "sheet": "sheet"
+  },
+  "prop:glyph_panel": {
+   "rect": [
+    1280,
+    384,
+    1408,
+    512
+   ],
+   "sheet": "sheet"
+  },
+  "prop:hatch": {
+   "rect": [
+    1408,
+    256,
+    1536,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:hauler": {
+   "rect": [
+    1152,
+    384,
+    1280,
+    512
+   ],
+   "sheet": "sheet"
+  },
+  "prop:keycard": {
+   "rect": [
+    384,
+    384,
+    512,
+    512
+   ],
+   "sheet": "sheet"
+  },
+  "prop:machine_part": {
+   "rect": [
+    1920,
+    256,
+    2048,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:obelisk": {
+   "rect": [
+    1280,
+    384,
+    1408,
+    512
+   ],
+   "sheet": "sheet"
+  },
+  "prop:pedestal": {
+   "rect": [
+    1408,
+    384,
+    1536,
+    512
+   ],
+   "sheet": "sheet"
+  },
+  "prop:pedestal_lit": {
+   "rect": [
+    1536,
+    384,
+    1664,
+    512
+   ],
+   "sheet": "sheet"
+  },
+  "prop:rubble": {
+   "rect": [
+    0,
+    384,
+    128,
+    512
+   ],
+   "sheet": "sheet"
+  },
+  "prop:rubble_cleared": {
+   "rect": [
+    1152,
+    0,
+    1280,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "prop:sample_tube": {
+   "rect": [
+    896,
+    384,
+    1024,
+    512
+   ],
+   "sheet": "sheet"
+  },
+  "prop:scanner": {
+   "rect": [
+    512,
+    384,
+    640,
+    512
+   ],
+   "sheet": "sheet"
+  },
+  "prop:survey_marker": {
+   "rect": [
+    896,
+    256,
+    1024,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:survey_marker_lit": {
+   "rect": [
+    1024,
+    256,
+    1152,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:tent": {
+   "rect": [
+    256,
+    384,
+    384,
+    512
+   ],
+   "sheet": "sheet"
+  },
+  "prop:tent_b": {
+   "rect": [
+    256,
+    384,
+    384,
+    512
+   ],
+   "sheet": "sheet"
+  },
+  "prop:terminal": {
+   "rect": [
+    1664,
+    256,
+    1792,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:vault_door": {
+   "rect": [
+    1408,
+    256,
+    1536,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:vault_door_open": {
+   "rect": [
+    128,
+    128,
+    256,
+    256
+   ],
+   "sheet": "sheet"
+  },
+  "ui:hint_lead": {
+   "rect": [
+    1792,
+    384,
+    1920,
+    512
+   ],
+   "sheet": "sheet"
+  },
+  "ui:hint_new": {
+   "rect": [
+    1664,
+    384,
+    1792,
+    512
+   ],
+   "sheet": "sheet"
+  },
+  "ui:hint_way": {
+   "rect": [
+    1920,
+    384,
+    2048,
+    512
+   ],
+   "sheet": "sheet"
+  }
+ }
+}

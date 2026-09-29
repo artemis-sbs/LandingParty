@@ -16,6 +16,11 @@ LP_CHECK_MODE: dice
 # Fix the dice for a repeatable run. 0 = unseeded.
 LP_SEED: 0
 
+# Art sets drawn over the mission's own `builtin` art, in order (see sbs_utils
+# tilemap_art.py). `frontier` is in the Cosmos-Tiles-Frontier media pack; without the pack the
+# builtin art is used.
+TILE_ART: frontier
+
 PLAYER_LIST:
     -   name: "Artemis"
         side: "tsn"

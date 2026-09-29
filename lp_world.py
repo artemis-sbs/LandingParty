@@ -16,38 +16,41 @@ Kinds used: `glyph`, `evidence`, `marker`, `flag`. `lp flag <name>` is a one-off
 """
 from sbs_utils.agent import Agent
 
-# How many looks each ground kind has. A field of one kind picks among them per cell, so
-# it does not repeat in a visible grid. `<kind>_v2` is the second look, and so on.
-LP_VARIANTS = {"dust": 3, "scrub": 3, "salt": 3, "path": 2, "floor": 2, "cave": 3,
-               "rock": 3, "brine": 2}
-
-# The atlas layout, row-major, 16 cells across. `_tools/make_tiles.py` reads THIS list to
-# draw the atlas, so the two can never disagree about which cell is which.
-LP_TILE_NAMES = [
-    "dust", "dust_v2", "dust_v3", "scrub", "scrub_v2", "scrub_v3", "salt", "salt_v2",
-    "salt_v3", "path", "path_v2", "floor", "floor_v2", "deck", "cave", "cave_v2",
-    "cave_v3", "glyphfloor", "rock", "rock_v2", "rock_v3", "cliff", "brine", "brine_v2",
-    "crystal", "wall", "pwall", "hull", "vent", "heat", "exit", None,
-    "crew", "colonist", "skaraan", "glassback", "sentinel", "vhesk", "youngster", "survivor",
-    "drone", "crate", "hauler", "door_shut", "door_open", "rockfall", "panel", "terminal",
-    "marker", "marker_set", "tent", "beacon", "pedestal", "pedestal_lit", "part", "key",
-    "medkit", "datapad", "bones", "drop", "sample", "console", "bed", None,
-    "hint_new", "hint_lead", "hint_way",
-]
-LP_ATLAS = ("media/lp_tiles", 16, 8, 128)
+# WHAT THINGS LOOK LIKE is not decided here. The mission names shared keys - `fig:crew_eva`,
+# `fig:skaraan_chief`, `prop:hauler`, ground looks like `dirt` - and an ART SET draws them: the mission's own `builtin` set
+# (media/tileart/builtin, made by `_tools/make_tiles.py`) and then whatever the TILE_ART
+# setting names, found in this mission or in a pinned media pack. A pack can redraw any
+# of it; one that is missing just leaves the builtin art. See sbs_utils tilemap_art.py.
 
 # kind -> (walk, see). A kind you can see across but not walk (brine, a cliff edge) is
 # what makes a map readable: the far bank is visible, getting there is the puzzle.
 _KINDS = {
-    "dust": (True, True), "scrub": (True, True), "salt": (True, True),
-    "path": (True, True), "floor": (True, True), "deck": (True, True),
-    "cave": (True, True), "glyphfloor": (True, True), "vent": (True, True),
-    "rock": (False, False), "cliff": (False, True), "brine": (False, True),
-    "crystal": (False, False), "wall": (False, False), "pwall": (False, False),
-    "hull": (False, False),
+    # kind:        (walk,  see,   the shared ground LOOK an art set draws it with)
+    "dust":        (True,  True,  "dirt"),
+    "scrub":       (True,  True,  "dirt_grass"),
+    "salt":        (True,  True,  "salt"),
+    "path":        (True,  True,  "sand_pale"),
+    "floor":       (True,  True,  "floor_metal"),
+    "deck":        (True,  True,  "floor_grate"),
+    "cave":        (True,  True,  "rock_floor"),
+    "glyphfloor":  (True,  True,  "stone_tiles"),
+    "vent":        (True,  True,  "vent"),
+    "rock":        (False, False, "rock"),
+    "cliff":       (False, True,  "cliff"),
+    "brine":       (False, True,  "water"),
+    "crystal":     (False, False, "crystal"),
+    "wall":        (False, False, "wall_metal"),
+    "pwall":       (False, False, "wall_ancient"),
+    "hull":        (False, False, "hull_metal"),
     # A way out, drawn as one: bright chevrons, so nobody has to guess where it is.
-    "exit": (True, True),
+    "exit":        (True,  True,  "exit"),
 }
+
+
+def lp_kinds():
+    """The tileset: Mereth's RULES (walk, see) and which shared ground each kind wears."""
+    return {k: {"walk": w, "see": s, "look": look} for k, (w, s, look) in _KINDS.items()}
+
 
 LP_AREAS = ["ridge", "colony", "flats", "caves", "lantern", "gnaw"]
 LP_COLONISTS = 212
@@ -56,25 +59,26 @@ LP_SHIP_LIFT = 60      # what the bridge alone can beam out before the dawn
 _STATE = {"tally": {}, "ending": None}
 
 
-def lp_setup_tiles():
-    """Register the atlas cells and the tileset. Call once, before loading areas."""
-    from sbs_utils.procedural.gui.image import gui_image_add_atlas_grid
+def lp_setup_tiles(*sets):
+    """Declare the tileset's rules and load the art. Call once, before loading areas.
+
+    Args:
+        *sets: art sets to load, in order. Default: `builtin` plus the TILE_ART setting.
+    """
     from sbs_utils.procedural.tilemap import tilemap_tileset
+    from sbs_utils.procedural.tilemap_art import tilemap_art_use
     from sbs_utils.procedural.boarding_tiles import boarding_tile_style
     from sbs_utils.procedural.boarding_combat import boarding_drop_sprite
     from sbs_utils.procedural.boarding_hints import boarding_hint_style
-    image, cols, rows, cell = LP_ATLAS
-    gui_image_add_atlas_grid(image, cols, rows,
-                             [("lp:" + n) if n else None for n in LP_TILE_NAMES], cell=cell)
-    tilemap_tileset("mereth", {
-        k: {"cell": "lp:" + k, "walk": w, "see": s,
-            "variants": ["lp:%s_v%d" % (k, i) for i in range(2, LP_VARIANTS.get(k, 1) + 1)]}
-        for k, (w, s) in _KINDS.items()})
+    # The RULES are the mission's; the looks come from the art sets.
+    tilemap_tileset("mereth", lp_kinds())
+    loaded = tilemap_art_use(*sets, tileset="mereth")
     # Badges over what is still worth a look: untouched, a quest lead, a new place.
-    boarding_hint_style(new="lp:hint_new", lead="lp:hint_lead", way="lp:hint_way")
-    boarding_tile_style(sprite="lp:crew",
+    boarding_hint_style(new="ui:hint_new", lead="ui:hint_lead", way="ui:hint_way")
+    boarding_tile_style(sprite="fig:crew_eva",
                         colors=["#4cf", "#fc4", "#f66", "#8f8", "#c8f", "#fa8"])
-    boarding_drop_sprite("lp:drop")
+    boarding_drop_sprite("prop:bag")
+    return loaded
 
 
 def lp_load_areas(read=None):

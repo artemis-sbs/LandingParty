@@ -105,7 +105,7 @@ or a signal from the bridge.
 ---
 Area: ridge
 Mark: drone
-Sprite: lp:drone
+Sprite: prop:drone_wreck
 Blocks: yes
 Scene: drone
 ---
@@ -115,7 +115,7 @@ A colony survey drone, nose-down in the scree, its antenna snapped.
 ---
 Area: ridge
 Mark: overlook
-Sprite: lp:marker
+Sprite: prop:antenna_dish
 Scene: overlook
 ---
 The edge of the ridge. East, the sky is the wrong color.
@@ -124,7 +124,7 @@ The edge of the ridge. East, the sky is the wrong color.
 ---
 Area: ridge
 At: 17, 17
-Sprite: lp:medkit
+Sprite: prop:crate_medical
 Item: medkit
 ---
 A colony first-aid pack, dropped and not collected.
@@ -133,7 +133,7 @@ A colony first-aid pack, dropped and not collected.
 ---
 Area: colony
 Mark: patience
-Sprite: lp:hauler
+Sprite: prop:hauler
 Blocks: yes
 Scene: patience
 ---
@@ -143,8 +143,8 @@ A heavy-lift hauler with her engine cowling open and three holes where parts sho
 ---
 Area: colony
 Mark: depot_door
-Sprite: lp:door_shut
-Open sprite: lp:door_open
+Sprite: prop:hatch
+Open sprite: prop:doorframe
 Blocks: yes
 Opens with: key depot_key, check engineering 10, cut
 ---
@@ -154,7 +154,7 @@ The colony depot. Padlocked, which nobody on Stillwater ever used to do.
 ---
 Area: colony
 At: 24, 8
-Sprite: lp:terminal
+Sprite: prop:terminal
 Blocks: yes
 Scene: depot_ledger
 ---
@@ -164,7 +164,7 @@ The stock terminal for the depot.
 ---
 Area: colony
 At: 26, 9
-Sprite: lp:part
+Sprite: prop:machine_part
 Item: cable
 ---
 A drum of main cable, the one part nobody could sell.
@@ -173,7 +173,7 @@ A drum of main cable, the one part nobody could sell.
 ---
 Area: colony
 At: 7, 20
-Sprite: lp:console
+Sprite: prop:console
 Blocks: yes
 Scene: clinic
 ---
@@ -183,7 +183,7 @@ A dispensary and a lab bench.
 ---
 Area: colony
 At: 8, 21
-Sprite: lp:medkit
+Sprite: prop:crate_medical
 Item: medkit
 ---
 
@@ -191,7 +191,7 @@ Item: medkit
 ---
 Area: colony
 At: 27, 20
-Sprite: lp:terminal
+Sprite: prop:terminal
 Blocks: yes
 Scene: office_log
 ---
@@ -201,8 +201,8 @@ The deputy's comms terminal. It is still logged in.
 ---
 Area: colony
 Mark: cellar_door
-Sprite: lp:door_shut
-Open sprite: lp:door_open
+Sprite: prop:hatch
+Open sprite: prop:doorframe
 Blocks: yes
 Opens with: key harrow_key, cut
 ---
@@ -212,8 +212,8 @@ A door to a root cellar. There is a new bolt on the outside.
 ---
 Area: colony
 Mark: rockfall
-Sprite: lp:rockfall
-Open sprite: lp:path
+Sprite: prop:rubble
+Open sprite: prop:rubble_cleared
 Blocks: yes
 Opens with: check engineering 11, cut
 ---
@@ -223,7 +223,7 @@ Half the switchback to the Lantern came down in the last tremor.
 ---
 Area: flats
 Mark: obelisk
-Sprite: lp:panel
+Sprite: prop:obelisk
 Blocks: yes
 Scene: glyph_1
 ---
@@ -233,7 +233,7 @@ A black pillar the Skaraan dug out of the salt. Every face of it is carved.
 ---
 Area: flats
 Mark: marker_1
-Sprite: lp:marker
+Sprite: prop:survey_marker
 Scene: marker_1
 ---
 A survey stake, knocked flat.
@@ -242,7 +242,7 @@ A survey stake, knocked flat.
 ---
 Area: flats
 Mark: marker_2
-Sprite: lp:marker
+Sprite: prop:survey_marker
 Scene: marker_2
 ---
 A survey stake, knocked flat.
@@ -251,7 +251,7 @@ A survey stake, knocked flat.
 ---
 Area: flats
 Mark: marker_3
-Sprite: lp:marker
+Sprite: prop:survey_marker
 Scene: marker_3
 ---
 A survey stake, knocked flat.
@@ -260,7 +260,7 @@ A survey stake, knocked flat.
 ---
 Area: flats
 Mark: camp_crate
-Sprite: lp:crate
+Sprite: prop:crate
 Blocks: yes
 Scene: camp_crate
 ---
@@ -270,7 +270,7 @@ Salvage crates, stacked for loading.
 ---
 Area: caves
 Mark: glyph_2
-Sprite: lp:panel
+Sprite: prop:glyph_panel
 Blocks: yes
 Scene: glyph_2
 ---
@@ -280,7 +280,7 @@ A smooth face in the rough rock, too regular to be natural.
 ---
 Area: caves
 Mark: coil_nest
-Sprite: lp:part
+Sprite: prop:machine_part
 Item: coil
 ---
 A hauler power coil, still warm. Something dragged it down here to lie on it.
@@ -289,8 +289,8 @@ A hauler power coil, still warm. Something dragged it down here to lie on it.
 ---
 Area: caves
 Mark: crystal_seam
-Sprite: lp:crystal
-Open sprite: lp:cave
+Sprite: prop:crystal_seam
+Open sprite: prop:crystal_seam_mined
 Blocks: yes
 Opens with: cut, check athletics 12
 ---
@@ -300,7 +300,7 @@ A curtain of crystal across a passage. There is cold air behind it.
 ---
 Area: lantern
 Mark: glyph_3
-Sprite: lp:panel
+Sprite: prop:glyph_panel
 Blocks: yes
 Scene: glyph_3
 ---
@@ -309,7 +309,7 @@ Scene: glyph_3
 ---
 Area: lantern
 Mark: glyph_4
-Sprite: lp:panel
+Sprite: prop:glyph_panel
 Blocks: yes
 Scene: glyph_4
 ---
@@ -318,8 +318,8 @@ Scene: glyph_4
 ---
 Area: lantern
 Mark: inner_door
-Sprite: lp:door_shut
-Open sprite: lp:glyphfloor
+Sprite: prop:vault_door
+Open sprite: prop:vault_door_open
 Blocks: yes
 Opens with: check science 9, signal lp_power
 ---
@@ -329,7 +329,7 @@ A seamless door. The glyphs around its frame move when you look away.
 ---
 Area: lantern
 Mark: pedestal
-Sprite: lp:pedestal
+Sprite: prop:pedestal
 Blocks: yes
 Scene: pedestal
 ---
@@ -339,7 +339,7 @@ An empty socket, sized for something the size of a person's chest.
 ---
 Area: lantern
 Mark: control
-Sprite: lp:console
+Sprite: prop:ancient_console
 Blocks: yes
 Scene: control
 ---
@@ -348,8 +348,8 @@ Scene: control
 ---
 Area: gnaw
 Mark: hold_door
-Sprite: lp:door_shut
-Open sprite: lp:door_open
+Sprite: prop:hatch
+Open sprite: prop:doorframe
 Blocks: yes
 Opens with: key vhesk_key, cut
 ---
@@ -358,7 +358,7 @@ Opens with: key vhesk_key, cut
 ---
 Area: gnaw
 At: 16, 5
-Sprite: lp:crate
+Sprite: prop:crate
 Blocks: yes
 Scene: hold_crate
 ---
@@ -373,8 +373,7 @@ sentries start hostile and CAN be talked down.
 ---
 Area: colony
 At: 10, 14
-Sprite: lp:colonist
-Color: "#fd8"
+Sprite: fig:captain_f
 Calm: yes
 HP: 3
 Damage: 0
@@ -385,8 +384,7 @@ Talk scene: oyelaran
 ---
 Area: colony
 At: 28, 21
-Sprite: lp:colonist
-Color: "#f96"
+Sprite: fig:junker_m
 Calm: yes
 HP: 3
 Damage: 0
@@ -397,7 +395,7 @@ Talk scene: harrow
 ---
 Area: colony
 At: 24, 16
-Sprite: lp:colonist
+Sprite: fig:junker_f
 Calm: yes
 HP: 9
 Damage: 0
@@ -408,7 +406,7 @@ Talk scene: crowd
 ---
 Area: colony
 At: 31, 21
-Sprite: lp:youngster
+Sprite: fig:skaraan_young
 Calm: yes
 HP: 2
 Damage: 0
@@ -419,7 +417,7 @@ Talk scene: yilla
 ---
 Area: caves
 At: 5, 4
-Sprite: lp:survivor
+Sprite: fig:crew_f
 Calm: yes
 HP: 1
 Damage: 0
@@ -430,7 +428,7 @@ Talk scene: castellan
 ---
 Area: caves
 At: 6, 3
-Sprite: lp:survivor
+Sprite: fig:medic_m
 Calm: yes
 HP: 2
 Damage: 0
@@ -441,7 +439,7 @@ Talk scene: brandt
 ---
 Area: gnaw
 Mark: vhesk_seat
-Sprite: lp:vhesk
+Sprite: fig:skaraan_chief
 Calm: yes
 HP: 6
 Damage: 2
@@ -452,7 +450,7 @@ Talk scene: vhesk
 ---
 Area: flats
 Mark: sentry_post
-Sprite: lp:skaraan
+Sprite: fig:skaraan
 HP: 3
 Damage: 1
 Notice: 5
@@ -464,7 +462,7 @@ Talk scene: sentry
 ---
 Area: flats
 At: 26, 5
-Sprite: lp:skaraan
+Sprite: fig:skaraan
 HP: 3
 Damage: 1
 Notice: 5
@@ -477,7 +475,7 @@ Talk scene: sentry
 ---
 Area: gnaw
 At: 12, 8
-Sprite: lp:skaraan
+Sprite: fig:skaraan
 Calm: yes
 HP: 3
 Damage: 1
@@ -491,7 +489,7 @@ Talk scene: deckhand
 ---
 Area: caves
 At: 18, 3
-Sprite: lp:glassback
+Sprite: fig:glassback
 HP: 2
 Damage: 1
 Notice: 5
@@ -506,7 +504,7 @@ A heat-hunter the size of a dog, all ribs and glass-clear skin.
 ---
 Area: caves
 At: 26, 14
-Sprite: lp:glassback
+Sprite: fig:glassback
 HP: 2
 Damage: 1
 Notice: 4
@@ -519,7 +517,7 @@ Curled near the coil, warming itself.
 ---
 Area: caves
 At: 10, 10
-Sprite: lp:glassback
+Sprite: fig:glassback
 HP: 2
 Damage: 1
 Notice: 5
@@ -533,7 +531,7 @@ Drops: venom
 ---
 Area: lantern
 At: 12, 10
-Sprite: lp:sentinel
+Sprite: fig:robot_war
 HP: 4
 Damage: 1
 Notice: 6
@@ -547,7 +545,7 @@ A shape of light and edges that walks the hall.
 ---
 Area: lantern
 At: 18, 7
-Sprite: lp:sentinel
+Sprite: fig:robot_war
 HP: 4
 Damage: 1
 Notice: 5
