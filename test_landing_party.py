@@ -174,6 +174,38 @@ class TestTheContentResolves(World):
             s = K.boarding_hostile(key)["talk"]
             self.assertTrue(not s or s in self.scenes, f"{key}: no scene {s}")
 
+    def test_every_quest_lead_is_a_prop_or_person(self):
+        """A `Leads to:` key nobody declared would just never be badged - silently."""
+        for section in ("quests", "side_stories"):
+            stack = list(amd_section(self.world, section).get("children", []))
+            while stack:
+                n = stack.pop()
+                stack.extend(n.get("children", []) or [])
+                for key in str((n.get("data") or {}).get("leads_to") or "").split(","):
+                    key = key.strip().lower()
+                    if key:
+                        self.assertTrue(P.boarding_prop(key) or K.boarding_hostile(key),
+                                        f"{n.get('key')}: leads to unknown {key!r}")
+
+    def test_a_crew_member_is_pointed_at_their_side_story(self):
+        from sbs_utils.procedural.boarding_hints import boarding_leads
+        self.assertIn("obelisk", boarding_leads(SCI))
+        self.assertNotIn("obelisk", boarding_leads(ENG))
+
+    def test_the_ridge_shows_what_is_worth_a_look(self):
+        from sbs_utils.procedural.boarding_hints import boarding_hints
+        T.tilemap_reveal_all("ridge")
+        drone = T.tilemap_where(P.boarding_prop("drone")["id"])
+        self.assertEqual(boarding_hints(ENG, "ridge").get((drone[1], drone[2])), "new")
+        self.assertIn("way", boarding_hints(ENG, "ridge").values())
+
+    def test_every_tile_name_has_a_cell_in_the_atlas(self):
+        from PIL import Image
+        img = Image.open(os.path.join(HERE, "media", "lp_tiles.png"))
+        _, cols, rows, cell = L.LP_ATLAS
+        self.assertEqual(img.size, (cols * cell, rows * cell))
+        self.assertLessEqual(len(L.LP_TILE_NAMES), cols * rows)
+
     def test_every_choice_goes_somewhere_real(self):
         for key, node in list(self.scenes.items()) + list(self.hails.items()):
             for ch in dialogue_parse(node)["choices"]:

@@ -16,16 +16,25 @@ Kinds used: `glyph`, `evidence`, `marker`, `flag`. `lp flag <name>` is a one-off
 """
 from sbs_utils.agent import Agent
 
-# The atlas layout, in the order `_tools/make_tiles.py` draws it. Change both together.
+# How many looks each ground kind has. A field of one kind picks among them per cell, so
+# it does not repeat in a visible grid. `<kind>_v2` is the second look, and so on.
+LP_VARIANTS = {"dust": 3, "scrub": 3, "salt": 3, "path": 2, "floor": 2, "cave": 3,
+               "rock": 3, "brine": 2}
+
+# The atlas layout, row-major, 16 cells across. `_tools/make_tiles.py` reads THIS list to
+# draw the atlas, so the two can never disagree about which cell is which.
 LP_TILE_NAMES = [
-    "dust", "scrub", "salt", "path", "floor", "deck", "cave", "glyphfloor",
-    "rock", "cliff", "brine", "crystal", "wall", "pwall", "hull", "vent",
+    "dust", "dust_v2", "dust_v3", "scrub", "scrub_v2", "scrub_v3", "salt", "salt_v2",
+    "salt_v3", "path", "path_v2", "floor", "floor_v2", "deck", "cave", "cave_v2",
+    "cave_v3", "glyphfloor", "rock", "rock_v2", "rock_v3", "cliff", "brine", "brine_v2",
+    "crystal", "wall", "pwall", "hull", "vent", "heat", "exit", None,
     "crew", "colonist", "skaraan", "glassback", "sentinel", "vhesk", "youngster", "survivor",
     "drone", "crate", "hauler", "door_shut", "door_open", "rockfall", "panel", "terminal",
     "marker", "marker_set", "tent", "beacon", "pedestal", "pedestal_lit", "part", "key",
-    "medkit", "datapad", "bones", "drop", "sample", "console", "bed", "heat",
-    "exit",
+    "medkit", "datapad", "bones", "drop", "sample", "console", "bed", None,
+    "hint_new", "hint_lead", "hint_way",
 ]
+LP_ATLAS = ("media/lp_tiles", 16, 8, 128)
 
 # kind -> (walk, see). A kind you can see across but not walk (brine, a cliff edge) is
 # what makes a map readable: the far bank is visible, getting there is the puzzle.
@@ -53,10 +62,16 @@ def lp_setup_tiles():
     from sbs_utils.procedural.tilemap import tilemap_tileset
     from sbs_utils.procedural.boarding_tiles import boarding_tile_style
     from sbs_utils.procedural.boarding_combat import boarding_drop_sprite
-    gui_image_add_atlas_grid("media/lp_tiles", 8, 8,
-                             ["lp:" + n for n in LP_TILE_NAMES], cell=64)
-    tilemap_tileset("mereth", {k: {"cell": "lp:" + k, "walk": w, "see": s}
-                               for k, (w, s) in _KINDS.items()})
+    from sbs_utils.procedural.boarding_hints import boarding_hint_style
+    image, cols, rows, cell = LP_ATLAS
+    gui_image_add_atlas_grid(image, cols, rows,
+                             [("lp:" + n) if n else None for n in LP_TILE_NAMES], cell=cell)
+    tilemap_tileset("mereth", {
+        k: {"cell": "lp:" + k, "walk": w, "see": s,
+            "variants": ["lp:%s_v%d" % (k, i) for i in range(2, LP_VARIANTS.get(k, 1) + 1)]}
+        for k, (w, s) in _KINDS.items()})
+    # Badges over what is still worth a look: untouched, a quest lead, a new place.
+    boarding_hint_style(new="lp:hint_new", lead="lp:hint_lead", way="lp:hint_way")
     boarding_tile_style(sprite="lp:crew",
                         colors=["#4cf", "#fc4", "#f66", "#8f8", "#c8f", "#fa8"])
     boarding_drop_sprite("lp:drop")

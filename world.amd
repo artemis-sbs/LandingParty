@@ -569,6 +569,7 @@ Two hundred and twelve people, one canyon, forty minutes of night. Get them thro
 ---
 State: active
 Done when: signal lp_met_magistrate
+Leads to: oyelaran
 ---
 Stillwater's magistrate is in the town hall, down the canyon from the landing ridge.
 
@@ -576,6 +577,7 @@ Stillwater's magistrate is in the town hall, down the canyon from the landing ri
 ---
 State: secret
 Done when: signal lp_launch
+Leads to: patience
 ---
 Fit the three missing parts to the Patience and fly her out of the canyon.
 
@@ -583,6 +585,7 @@ Fit the three missing parts to the Patience and fly her out of the canyon.
 ---
 State: secret
 Done when: signal lp_wake
+Leads to: pedestal, control
 ---
 Wake the Lantern: put its core back, give it power from orbit, and ask it to turn.
 
@@ -590,6 +593,7 @@ Wake the Lantern: put its core back, give it power from orbit, and ask it to tur
 ---
 State: secret
 Done when: signal lp_bargain
+Leads to: vhesk
 ---
 Vhesk's ship could lift the whole colony. She will want something for it.
 
@@ -603,6 +607,7 @@ goes to the whole party.
 For: engineering
 State: active
 Done when: signal lp_hauler_fixed
+Leads to: camp_crate, coil, depot_door, cable, patience
 ---
 The injector, the coil and the main cable - find them, and fit them to the Patience.
 
@@ -611,6 +616,7 @@ The injector, the coil and the main cable - find them, and fit them to the Patie
 For: science
 State: active
 Done when: signal lp_glyphs_all
+Leads to: obelisk, glyph_2_panel, glyph_3_panel, glyph_4_panel
 ---
 Four carved panels: on the salt flats, in the caves, and two inside the Lantern. Read them all before anyone wakes it.
 
@@ -619,6 +625,7 @@ Four carved panels: on the salt flats, in the caves, and two inside the Lantern.
 For: security
 State: active
 Done when: signal lp_harrow_confessed
+Leads to: depot_ledger, office_log, camp_crate, harrow
 ---
 Somebody sold the Patience's parts. Find the proof, then find out why.
 
@@ -627,6 +634,7 @@ Somebody sold the Patience's parts. Find the proof, then find out why.
 For: comms
 State: active
 Done when: signal lp_yilla_home
+Leads to: vhesk, cellar_door, yilla
 ---
 The Skaraan boss is holding something back. Find out what she has lost.
 
@@ -635,6 +643,7 @@ The Skaraan boss is holding something back. Find out what she has lost.
 For: helm
 State: active
 Done when: signal lp_road_done
+Leads to: marker_1, marker_2, marker_3
 ---
 Reset the three survey markers on the flats, so the Patience has a road to fly.
 
@@ -643,5 +652,6 @@ Reset the three survey markers on the flats, so the Patience has a road to fly.
 For: medical
 State: active
 Done when: signal lp_survivors_saved
+Leads to: castellan, brandt, crystal_seam
 ---
 Stillwater's survey team went into the Cinder Caves three days ago. Bring them home.
