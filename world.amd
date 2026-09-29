@@ -1,0 +1,647 @@
+# [Dawnline](dawnline)
+
+Mereth turns so slowly that its night lasts sixty days, and its day is hot enough to melt
+lead. The farming colony of Stillwater sits in a canyon on the night side. The Dawnline -
+the edge of the light - is coming up the valley, and the colony's hauler is grounded.
+
+Everything below is content. `story.mast` spawns it and counts it; the words live here and
+in `scenes.amd`. The three ways out are the Patience (fly them), the Lantern (shade them)
+and the Gnaw (make a deal), and the six side stories each open or cheapen one of them.
+
+## [Voices](voices)
+
+Speakers the scenes name. Nobody here is spawned from this list; the people you can walk
+up to are in `## People`.
+
+### [Stillwater](stillwater)
+---
+Roles: narrator
+Color: "#cba"
+---
+The colony, and what you are looking at.
+
+### [The Lantern](lantern_voice)
+---
+Roles: narrator
+Color: "#8df"
+---
+Something very old, speaking in shapes.
+
+## [Hails](hails)
+
+What reaches the bridge. These choices are the ship's, so they carry no crew guards.
+
+### [Stillwater Is Calling](orbit_call)
+---
+Speaker: stillwater
+Title: Stillwater Colony
+Presentation: orbit
+Subject: gasgiant
+Color: "#cba"
+---
+% Automated relay, looping. Two hundred and twelve colonists, one grounded hauler, and a line of sunrise forty minutes out. Then a live voice cuts in: "Whoever you are - we need hands on the ground, not a lecture from orbit."
+
+- [Tell them a landing party is coming](orbit_accept)
+- [Ask what the hauler needs](orbit_detail)
+- [Hold position and keep scanning]()
+
+### [What the Hauler Needs](orbit_detail)
+---
+Speaker: stillwater
+Title: Stillwater Colony
+Presentation: orbit
+Subject: gasgiant
+Color: "#cba"
+---
+% "An injector, a coil, a length of main cable. Parts we HAD, three days ago." A pause. "Come down and I will explain the rest to your face."
+
+- [Tell them a landing party is coming](orbit_accept)
+- [Hold position and keep scanning]()
+
+### [A Landing Party Is Coming](orbit_accept)
+---
+Speaker: stillwater
+Title: Stillwater Colony
+Presentation: orbit
+Subject: gasgiant
+Color: "#cba"
+---
+% "Land on the ridge above us. The canyon floor is no place for a transporter lock." The relay drops back to its loop.
+
+- [Assemble a boarding party]()
+
+### [The Lantern Is Waiting](lantern_power)
+---
+Speaker: lantern_voice
+Title: Landing Party
+Presentation: orbit
+Subject: gasgiant
+Color: "#8df"
+---
+% From the surface: "The core is seated. It wants power it has not had in a very long time - a lot of it, all at once, from above. Hold orbit and give it everything the conduit can carry."
+
+- [Channel the conduit into the Lantern](lantern_power_go)
+- [Not yet]()
+
+### [Conduit Open](lantern_power_go)
+---
+Speaker: lantern_voice
+Title: Landing Party
+Presentation: orbit
+Subject: gasgiant
+Color: "#8df"
+---
+% The conduit hums. On the ridge above Stillwater, something unfolds toward the sun.
+
+- [Tell the landing party it is theirs]() ; signal lp_power
+
+## [Props](props)
+
+Things on the ground. `At:` is a mark in the area file or `x, y`. `Opens with:` is tried
+in order by whoever uses it - a key anyone in the party carries, a skill check, a CUT shot,
+or a signal from the bridge.
+
+### [Survey drone](drone)
+---
+Area: ridge
+Mark: drone
+Sprite: lp:drone
+Blocks: yes
+Scene: drone
+---
+A colony survey drone, nose-down in the scree, its antenna snapped.
+
+### [The overlook](overlook_post)
+---
+Area: ridge
+Mark: overlook
+Sprite: lp:marker
+Scene: overlook
+---
+The edge of the ridge. East, the sky is the wrong color.
+
+### [Field medkit](medkit_ridge)
+---
+Area: ridge
+At: 17, 17
+Sprite: lp:medkit
+Item: medkit
+---
+A colony first-aid pack, dropped and not collected.
+
+### [The Patience](patience)
+---
+Area: colony
+Mark: patience
+Sprite: lp:hauler
+Blocks: yes
+Scene: patience
+---
+A heavy-lift hauler with her engine cowling open and three holes where parts should be.
+
+### [Depot shutter](depot_door)
+---
+Area: colony
+Mark: depot_door
+Sprite: lp:door_shut
+Open sprite: lp:door_open
+Blocks: yes
+Opens with: key depot_key, check engineering 10, cut
+---
+The colony depot. Padlocked, which nobody on Stillwater ever used to do.
+
+### [Depot ledger](depot_ledger)
+---
+Area: colony
+At: 24, 8
+Sprite: lp:terminal
+Blocks: yes
+Scene: depot_ledger
+---
+The stock terminal for the depot.
+
+### [Main cable](cable)
+---
+Area: colony
+At: 26, 9
+Sprite: lp:part
+Item: cable
+---
+A drum of main cable, the one part nobody could sell.
+
+### [Clinic bench](clinic_bench)
+---
+Area: colony
+At: 7, 20
+Sprite: lp:console
+Blocks: yes
+Scene: clinic
+---
+A dispensary and a lab bench.
+
+### [Clinic medkit](medkit_clinic)
+---
+Area: colony
+At: 8, 21
+Sprite: lp:medkit
+Item: medkit
+---
+
+### [Deputy's terminal](office_log)
+---
+Area: colony
+At: 27, 20
+Sprite: lp:terminal
+Blocks: yes
+Scene: office_log
+---
+The deputy's comms terminal. It is still logged in.
+
+### [Cellar door](cellar_door)
+---
+Area: colony
+Mark: cellar_door
+Sprite: lp:door_shut
+Open sprite: lp:door_open
+Blocks: yes
+Opens with: key harrow_key, cut
+---
+A door to a root cellar. There is a new bolt on the outside.
+
+### [Rockfall](rockfall)
+---
+Area: colony
+Mark: rockfall
+Sprite: lp:rockfall
+Open sprite: lp:path
+Blocks: yes
+Opens with: check engineering 11, cut
+---
+Half the switchback to the Lantern came down in the last tremor.
+
+### [The obelisk](obelisk)
+---
+Area: flats
+Mark: obelisk
+Sprite: lp:panel
+Blocks: yes
+Scene: glyph_1
+---
+A black pillar the Skaraan dug out of the salt. Every face of it is carved.
+
+### [Survey marker site](marker_1)
+---
+Area: flats
+Mark: marker_1
+Sprite: lp:marker
+Scene: marker_1
+---
+A survey stake, knocked flat.
+
+### [Survey marker site](marker_2)
+---
+Area: flats
+Mark: marker_2
+Sprite: lp:marker
+Scene: marker_2
+---
+A survey stake, knocked flat.
+
+### [Survey marker site](marker_3)
+---
+Area: flats
+Mark: marker_3
+Sprite: lp:marker
+Scene: marker_3
+---
+A survey stake, knocked flat.
+
+### [Camp crates](camp_crate)
+---
+Area: flats
+Mark: camp_crate
+Sprite: lp:crate
+Blocks: yes
+Scene: camp_crate
+---
+Salvage crates, stacked for loading.
+
+### [Carved wall](glyph_2_panel)
+---
+Area: caves
+Mark: glyph_2
+Sprite: lp:panel
+Blocks: yes
+Scene: glyph_2
+---
+A smooth face in the rough rock, too regular to be natural.
+
+### [Power coil](coil)
+---
+Area: caves
+Mark: coil_nest
+Sprite: lp:part
+Item: coil
+---
+A hauler power coil, still warm. Something dragged it down here to lie on it.
+
+### [Crystal seam](crystal_seam)
+---
+Area: caves
+Mark: crystal_seam
+Sprite: lp:crystal
+Open sprite: lp:cave
+Blocks: yes
+Opens with: cut, check athletics 12
+---
+A curtain of crystal across a passage. There is cold air behind it.
+
+### [Hall panel](glyph_3_panel)
+---
+Area: lantern
+Mark: glyph_3
+Sprite: lp:panel
+Blocks: yes
+Scene: glyph_3
+---
+
+### [Anteroom panel](glyph_4_panel)
+---
+Area: lantern
+Mark: glyph_4
+Sprite: lp:panel
+Blocks: yes
+Scene: glyph_4
+---
+
+### [Inner door](inner_door)
+---
+Area: lantern
+Mark: inner_door
+Sprite: lp:door_shut
+Open sprite: lp:glyphfloor
+Blocks: yes
+Opens with: check science 9, signal lp_power
+---
+A seamless door. The glyphs around its frame move when you look away.
+
+### [The pedestal](pedestal)
+---
+Area: lantern
+Mark: pedestal
+Sprite: lp:pedestal
+Blocks: yes
+Scene: pedestal
+---
+An empty socket, sized for something the size of a person's chest.
+
+### [The control](control)
+---
+Area: lantern
+Mark: control
+Sprite: lp:console
+Blocks: yes
+Scene: control
+---
+
+### [Hold door](hold_door)
+---
+Area: gnaw
+Mark: hold_door
+Sprite: lp:door_shut
+Open sprite: lp:door_open
+Blocks: yes
+Opens with: key vhesk_key, cut
+---
+
+### [Vault crate](hold_crate)
+---
+Area: gnaw
+At: 16, 5
+Sprite: lp:crate
+Blocks: yes
+Scene: hold_crate
+---
+
+## [People](people)
+
+Everyone you can walk up to. They are actors on the map like anything else; `Calm: yes`
+means they will never attack, and `Talk scene:` is what clicking them opens. The Skaraan
+sentries start hostile and CAN be talked down.
+
+### [Magistrate Ines Oyelaran](oyelaran)
+---
+Area: colony
+At: 10, 14
+Sprite: lp:colonist
+Color: "#fd8"
+Calm: yes
+HP: 3
+Damage: 0
+Talk scene: oyelaran
+---
+
+### [Deputy Colm Harrow](harrow)
+---
+Area: colony
+At: 28, 21
+Sprite: lp:colonist
+Color: "#f96"
+Calm: yes
+HP: 3
+Damage: 0
+Talk scene: harrow
+---
+
+### [The colonists](crowd)
+---
+Area: colony
+At: 24, 16
+Sprite: lp:colonist
+Calm: yes
+HP: 9
+Damage: 0
+Talk scene: crowd
+---
+
+### [Yilla](yilla)
+---
+Area: colony
+At: 31, 21
+Sprite: lp:youngster
+Calm: yes
+HP: 2
+Damage: 0
+Talk scene: yilla
+---
+
+### [Dr Priya Castellan](castellan)
+---
+Area: caves
+At: 5, 4
+Sprite: lp:survivor
+Calm: yes
+HP: 1
+Damage: 0
+Talk scene: castellan
+---
+
+### [Oskar Brandt](brandt)
+---
+Area: caves
+At: 6, 3
+Sprite: lp:survivor
+Calm: yes
+HP: 2
+Damage: 0
+Talk scene: brandt
+---
+
+### [Vhesk](vhesk)
+---
+Area: gnaw
+Mark: vhesk_seat
+Sprite: lp:vhesk
+Calm: yes
+HP: 6
+Damage: 2
+Talk scene: vhesk
+---
+
+### [Skaraan sentry](sentry_1)
+---
+Area: flats
+Mark: sentry_post
+Sprite: lp:skaraan
+HP: 3
+Damage: 1
+Notice: 5
+Stun: 8
+Talk scene: sentry
+---
+
+### [Skaraan sentry](sentry_2)
+---
+Area: flats
+At: 26, 5
+Sprite: lp:skaraan
+HP: 3
+Damage: 1
+Notice: 5
+Stun: 8
+Patrol: 26 5; 31 5; 31 10; 26 10
+Talk scene: sentry
+---
+
+### [Skaraan deckhand](deckhand)
+---
+Area: gnaw
+At: 12, 8
+Sprite: lp:skaraan
+Calm: yes
+HP: 3
+Damage: 1
+Notice: 4
+Talk scene: deckhand
+---
+
+## [Hostiles](hostiles)
+
+### [Glassback](gb_1)
+---
+Area: caves
+At: 18, 3
+Sprite: lp:glassback
+HP: 2
+Damage: 1
+Notice: 5
+Stun: 10
+Speed: 3
+Patrol: 18 3; 25 4; 18 5
+Drops: venom
+---
+A heat-hunter the size of a dog, all ribs and glass-clear skin.
+
+### [Glassback](gb_2)
+---
+Area: caves
+At: 26, 14
+Sprite: lp:glassback
+HP: 2
+Damage: 1
+Notice: 4
+Stun: 10
+Speed: 3
+---
+Curled near the coil, warming itself.
+
+### [Glassback](gb_3)
+---
+Area: caves
+At: 10, 10
+Sprite: lp:glassback
+HP: 2
+Damage: 1
+Notice: 5
+Stun: 10
+Speed: 3
+Patrol: 10 10; 7 12; 12 12
+Drops: venom
+---
+
+### [Sentinel](sent_1)
+---
+Area: lantern
+At: 12, 10
+Sprite: lp:sentinel
+HP: 4
+Damage: 1
+Notice: 6
+Stun: 3
+Speed: 2
+Patrol: 12 10; 26 10
+---
+A shape of light and edges that walks the hall.
+
+### [Sentinel](sent_2)
+---
+Area: lantern
+At: 18, 7
+Sprite: lp:sentinel
+HP: 4
+Damage: 1
+Notice: 5
+Stun: 3
+Speed: 2
+---
+
+## [Quests](quests)
+
+### [Through the Dawnline](dawnline_arc)
+---
+State: active
+Scope: shared
+Done when: signal lp_saved
+---
+Two hundred and twelve people, one canyon, forty minutes of night. Get them through.
+
+#### [Find the magistrate](meet)
+---
+State: active
+Done when: signal lp_met_magistrate
+---
+Stillwater's magistrate is in the town hall, down the canyon from the landing ridge.
+
+#### [Fly them out](way_patience)
+---
+State: secret
+Done when: signal lp_launch
+---
+Fit the three missing parts to the Patience and fly her out of the canyon.
+
+#### [Shade the valley](way_lantern)
+---
+State: secret
+Done when: signal lp_wake
+---
+Wake the Lantern: put its core back, give it power from orbit, and ask it to turn.
+
+#### [Make a deal](way_gnaw)
+---
+State: secret
+Done when: signal lp_bargain
+---
+Vhesk's ship could lift the whole colony. She will want something for it.
+
+## [Side Stories](side_stories)
+
+One per job. Each goes to the crew member it is for; one nobody on the ground can take
+goes to the whole party.
+
+### [Patience's Heart](patience_heart)
+---
+For: engineering
+State: active
+Done when: signal lp_hauler_fixed
+---
+The injector, the coil and the main cable - find them, and fit them to the Patience.
+
+### [What the Lantern Says](lantern_says)
+---
+For: science
+State: active
+Done when: signal lp_glyphs_all
+---
+Four carved panels: on the salt flats, in the caves, and two inside the Lantern. Read them all before anyone wakes it.
+
+### [The Quiet Deputy](quiet_deputy)
+---
+For: security
+State: active
+Done when: signal lp_harrow_confessed
+---
+Somebody sold the Patience's parts. Find the proof, then find out why.
+
+### [Vhesk's Terms](vhesk_terms)
+---
+For: comms
+State: active
+Done when: signal lp_yilla_home
+---
+The Skaraan boss is holding something back. Find out what she has lost.
+
+### [A Road Through Salt](salt_road)
+---
+For: helm
+State: active
+Done when: signal lp_road_done
+---
+Reset the three survey markers on the flats, so the Patience has a road to fly.
+
+### [The Survey Team](survey_team)
+---
+For: medical
+State: active
+Done when: signal lp_survivors_saved
+---
+Stillwater's survey team went into the Cinder Caves three days ago. Bring them home.

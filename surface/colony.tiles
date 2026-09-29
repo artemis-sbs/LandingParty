@@ -1,0 +1,61 @@
+area: colony
+title: Stillwater
+tileset: mereth
+entry: square
+legend:
+  .: dust
+  ,: scrub
+  #: rock
+  ^: cliff
+  =: path
+  _: floor
+  W: wall
+  N: exit @to_lantern
+  n: path @rockfall
+  V: exit @to_caves
+  R: exit @to_ridge
+  s: path @square
+  P: floor @patience
+  p: floor @pad
+  h: floor @hall
+  m: floor @clinic
+  d: floor @depot
+  D: floor @depot_door
+  k: floor @office
+  K: floor @cellar_door
+  x: floor @cellar
+  c: dust @crowd
+exits:
+  to_ridge: ridge @to_colony
+  to_caves: caves @to_colony
+  to_lantern: lantern @to_colony
+---
+^^^^^^^^^^^^^^^^^N^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^#=#^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^##n##^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^##....=....##^^^^^^^^^^^^^^
+^^^^^^^^^##......=......##^^^^^^^^^^^^
+^^^^^^^##........=.........###^^^^^^^^
+^^^^^##...pppppp.=...............##^^^
+^^^^#.....pPpppp.=....WWWWWWW......#^^
+^^^#......pppppp.=....W_ddd_W......#^^
+^^#.......pppppp.=....W_ddd_W.....,#^^
+^^#.......pppppp.=....W_____W....,,#^^
+^#...............=....WWWDWWW.....,#^^
+VV.....WWWWWW....=........=........#^^
+VV.....W_hh_W....=........=........#^^
+^#.....W_hh_W...=sss=====.=.....#####^
+^#.....W____W...=sss=....==.....#^^^^^
+^#.....WW=WWW...=sss=..cccc.....#^^^^^
+^^#.......=.....==.==..cccc.....#^^^^^
+^^#........=====....==..........#^^^^^
+^^#..WWWWW...........==..WWWWWWW#^^^^^
+^^#..W_mm_W...........=..W_kk_Kx#^^^^^
+^^#..W_mm_W...........=..W_kk_Wx#^^^^^
+^^#..WW=WWW...........=..WWW=WWW#^^^^^
+^^##....=.............=....=....##^^^^
+^^^##....==============....=...##^^^^^
+^^^^###.........==.............#^^^^^^
+^^^^^^###.......==...........##^^^^^^^
+^^^^^^^^####....==.......#####^^^^^^^^
+^^^^^^^^^^^#####RR#######^^^^^^^^^^^^^

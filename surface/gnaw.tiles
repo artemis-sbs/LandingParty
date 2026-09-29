@@ -1,0 +1,29 @@
+area: gnaw
+title: The Gnaw
+tileset: mereth
+entry: to_flats
+known: no
+beam: no
+legend:
+  -: deck
+  H: hull
+  F: exit @to_flats
+  b: deck @bridge
+  v: deck @vhesk_seat
+  d: deck @hold_door
+  o: deck @hold
+  q: deck @quarters
+---
+HHHHHHHHHHHHHHHHHHHHHHHHHH
+HHHHHHHH----bbbb----HHHHHH
+HHHHHH-------bvb-------HHH
+HHHHH----------------HH-HH
+HHHH---HHHHH--HHHHH-----HH
+HHH----HqqqH--HooooH----HH
+HHH----HqqqH--HooooH----HH
+HHH-----------HHdHHH----HH
+HHHH--------------------HH
+HHHHH------------------HHH
+HHHHHHHH----------HHHHHHHH
+HHHHHHHHHHH-FFFF-HHHHHHHHH
+HHHHHHHHHHHHHHHHHHHHHHHHHH

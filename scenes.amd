@@ -1,0 +1,698 @@
+# [Dawnline Scenes](dawnline_scenes)
+
+Every conversation, reading and decision on Mereth. A scene opens for whoever walked up to
+the thing or person it belongs to (and anyone standing with them); the rest of the party
+carries on with their own.
+
+Conventions, so the file stays legible:
+
+* `if science` gates a choice to a JOB. `if skill comms >= 3` gates it to someone GOOD at
+  it. `if holding coil` asks the chooser's own pack, `if party coil` everyone's.
+* `check <skill> <dc> else <scene>` rolls for whoever chose it. A choice's other outcomes
+  happen WHETHER OR NOT the roll works - so the payoff of a check lives on the next beat's
+  continue choice, never beside the check.
+* `lp <kind> <item>` records what the party has done; `if lp <kind> >= n` asks.
+* An empty target `()` ends the conversation.
+
+## [Scenes](scenes)
+
+### [The Survey Drone](drone)
+---
+Speaker: stillwater
+---
+% The drone came down hard. Its camera eye still tracks you, a little late.
+% Colony markings, a snapped antenna, and a data port that is still warm.
+
+- [Pull its survey data](drone_data) if science
+- [Try the data port](drone_data) ; check science 7 else drone_dead
+- [Leave it]()
+
+### [Survey Data](drone_data)
+---
+Speaker: stillwater
+---
+% Three days of flight logs. The last run went down a crack in the canyon wall west of the colony - "Cinder Caves, survey team in" - and the one before it circled a structure on the far ridge the log only calls THE LANTERN.
+
+- [Mark both on the map](drone) ; discover caves, discover lantern, lp flag drone_read
+
+### [Dead Circuits](drone_dead)
+---
+Speaker: stillwater
+---
+% The port sparks and the camera eye goes dark. Whatever it knew, it is keeping.
+
+- [Leave it]()
+
+### [The Overlook](overlook)
+---
+Speaker: stillwater
+---
+% East, the horizon is not dark. It is the color of a stove ring, and it is closer than it was when you landed.
+% North across the canyon, on the far ridge, something tall and geometric stands against it - too regular for rock. It has a shadow the sun has not reached yet.
+
+- [Take a long look at the structure](overlook_lantern) if science
+- [Step back from the edge]()
+
+### [The Far Ridge](overlook_lantern)
+---
+Speaker: lantern_voice
+---
+% Built, not grown. Its faces are angled like a flower that has not opened, and every one of them points at the sunrise.
+
+- [Step back from the edge]() ; lp flag saw_lantern
+
+### [The Patience](patience)
+---
+Speaker: stillwater
+---
+% A heavy-lift hauler, cowling open. There are three sockets in her engine where parts should be: an injector, a coil, and a drum of main cable.
+
+- [Fit the injector](patience) if holding injector ; take injector, lp part injector
+- [Fit the coil](patience) if holding coil ; take coil, lp part coil
+- [Fit the main cable](patience) if holding cable ; take cable, lp part cable
+- [Bring her engine up](patience_fitted) if lp part >= 3 ; check engineering 9 else patience_botched
+- [Take the pilot's seat](patience_ready) if lp flag hauler_fixed
+- [Step away]()
+
+### [She Turns Over](patience_fitted)
+---
+Speaker: stillwater
+---
+% The injector coughs, catches, and holds. Every light on the flight deck comes up green at once and somebody in the square starts crying.
+
+- [Seal the cowling](patience) ; lp flag hauler_fixed, signal lp_hauler_fixed
+
+### [Not Yet](patience_botched)
+---
+Speaker: stillwater
+---
+% The coil arcs and the engine dies with a bang that brings the whole square running. Nothing is broken that was not already. Try again.
+
+- [Step away]()
+
+### [The Pilot's Seat](patience_ready)
+---
+Speaker: stillwater
+---
+% Two hundred and twelve people are already strapped in behind you. The canyon mouth is narrow, the salt beyond it is flat and featureless, and the light is coming.
+
+- [Fly out along the surveyed road](patience_launched) if lp flag road_clear
+- [Fly her out blind](patience_launched) if helm ; check helm 9 else patience_scare
+- [Try to fly her out](patience_launched) ; check helm 12 else patience_scare
+- [Not yet]()
+
+### [Lift-off](patience_launched)
+---
+Speaker: stillwater
+---
+% She climbs. The canyon walls fall away, the salt flats blur under her, and then there is nothing below but cloud.
+
+- [Take her up](patience) ; signal lp_launch
+
+### [Too Close](patience_scare)
+---
+Speaker: stillwater
+---
+% You lose the horizon over the salt and pull up with the wingtip a meter off the ground. She is back on the pad, nobody is hurt, and nobody is speaking.
+
+- [Try again when you are ready]()
+
+### [The Depot Ledger](depot_ledger)
+---
+Speaker: stillwater
+---
+% Stock records. The injector, the coil and two other hauler parts were signed out four days ago - all on the deputy's own code, all marked "returned to supplier". Stillwater has no supplier within six light-years.
+
+- [Copy the record](depot_ledger) if security ; lp evidence ledger
+- [Note it down](depot_ledger) ; lp evidence ledger
+- [Step away]()
+
+### [The Clinic](clinic)
+---
+Speaker: stillwater
+---
+% A dispensary, a lab bench, and a centrifuge that still works.
+
+- [Brew antivenom from the sample](clinic_brewed) if holding venom ; take venom, check medical 8 else clinic_spoiled
+- [Step away]()
+
+### [Antivenom](clinic_brewed)
+---
+Speaker: stillwater
+---
+% Two doses, faintly blue. They will not keep long in this cold.
+
+- [Pack them](clinic) ; give antidote
+
+### [Spoiled](clinic_spoiled)
+---
+Speaker: stillwater
+---
+% It separates in the centrifuge. The sample is gone. You will need another.
+
+- [Step away]()
+
+### [The Deputy's Terminal](office_log)
+---
+Speaker: stillwater
+---
+% Comms logs. Three nights ago the deputy called the Skaraan ship on a private band, and the night after he called it again, shouting. The last entry is a single line: "You get the part when I get my family on your ship."
+
+- [Save the log](office_log) ; lp evidence log
+- [Step away]()
+
+### [Magistrate Oyelaran](oyelaran)
+---
+Speaker: stillwater
+---
+% A tall woman in a coat three sizes too big, with a clipboard she has clearly been holding for days. "You are the ship. Good. Sit down or stand up, but listen."
+
+- [We are here to get you out](oyelaran_plan) ; signal lp_met_magistrate
+- [What happened to the hauler?](oyelaran_hauler)
+- [Tell me about the Lantern](oyelaran_lantern)
+- [Where is your survey team?](oyelaran_survey)
+- [Later]()
+
+### [The Plan](oyelaran_plan)
+---
+Speaker: stillwater
+---
+% "Three ways, as far as I can see. Fix the Patience and fly everyone out. Or the Skaraan - their ship could take us all, and their captain knows it. Or the old stories are true and that thing on the ridge was built to keep this valley in shadow." She looks at the sky. "Pick one fast."
+
+- [Where are the hauler's parts?](oyelaran_hauler)
+- [Tell me about the Lantern](oyelaran_lantern)
+- [We will be back]()
+
+### [The Hauler](oyelaran_hauler)
+---
+Speaker: stillwater
+---
+% "The injector and the coil went missing four days ago. The cable is in the depot, and my deputy has the depot key, and my deputy has not been himself." She does not say anything else about that, which says a great deal.
+
+- [Where is the deputy?](oyelaran_deputy)
+- [Back]()
+
+### [The Deputy](oyelaran_deputy)
+---
+Speaker: stillwater
+---
+% "Colm Harrow. His office is by the east wall. He has a wife and two children on the list for the Patience, same as everyone." A pause. "He keeps checking the Skaraan band."
+
+- [Back]()
+
+### [The Lantern](oyelaran_lantern)
+---
+Speaker: stillwater
+---
+% "The first settlers found it already here. It never did anything. The Skaraan came to dig it out a week ago, and since then the tremors have been worse and the - things - in the caves have been coming up." She shrugs. "Stories say it used to turn."
+
+- [Back]() ; discover lantern
+
+### [The Survey Team](oyelaran_survey)
+---
+Speaker: stillwater
+---
+% "Castellan and Brandt went into the Cinder Caves to see what was bringing the glassbacks up. That was three days ago. The cave mouth is at the west end of the canyon."
+
+- [We will look for them]() ; discover caves
+
+### [The Colonists](crowd)
+---
+Speaker: stillwater
+---
+% Two hundred people in coats, sitting on their luggage in the square. Children asleep across their parents' knees.
+% Somebody has chalked a clock face on the ground. The hands are drawn in at sunrise.
+
+- [Ask what they have heard](crowd_rumor)
+- [Tell them to be ready to move]() ; lp flag crowd_warned
+
+### [Talk in the Square](crowd_rumor)
+---
+Speaker: stillwater
+---
+% "The Skaraan paid Harrow in something - I saw him with a crate." "The glassbacks follow heat. Do not run hot in the caves." "My grandmother said the Lantern turns if you ask it right. She never said what right was."
+
+- [Thank them]()
+
+### [Deputy Harrow](harrow)
+---
+Speaker: stillwater
+---
+% A thin man who cannot keep his hands still. "If the magistrate sent you about the depot, the key is - it is around. I will find it."
+
+- [Ask for the depot key](harrow_key) ; check comms 9 else harrow_stonewall
+- [Lay out what you found](harrow_confront) if lp evidence >= 2
+- [Leave him be]()
+
+### [The Key](harrow_key)
+---
+Speaker: stillwater
+---
+% He hands it over like it weighs a great deal more than it does.
+
+- [Take it]() ; give depot_key
+
+### [Stonewalled](harrow_stonewall)
+---
+Speaker: stillwater
+---
+% "I said I would find it." He turns back to his terminal and does not turn round again.
+
+- [Leave him be]()
+
+### [The Truth](harrow_confront)
+---
+Speaker: stillwater
+---
+% He reads the ledger and the log you put in front of him, and sits down on the floor. "I sold them the parts so they would take my family. Then their captain said the deal was off - that she would take everybody or nobody. So I took something of hers." He points at the cellar door. "She is only a child. She is fine. I did not know what else to do."
+
+- [Take his keys](harrow_confessed) if security
+- [Take his keys](harrow_confessed) ; check security 8 else harrow_bolts
+
+### [Keys](harrow_confessed)
+---
+Speaker: stillwater
+---
+% The depot key and a heavy iron one for the cellar bolt.
+
+- [Take them]() ; give depot_key, give harrow_key, signal lp_harrow_confessed
+
+### [He Runs](harrow_bolts)
+---
+Speaker: stillwater
+---
+% He is past you and out of the door before anyone moves. He will not get far in a canyon - but he took his keys with him.
+
+- [Let him go]() ; signal lp_harrow_fled
+
+### [Yilla](yilla)
+---
+Speaker: stillwater
+---
+% A Skaraan child, maybe ten in their years, wrapped in a colony blanket and furious about it. She says something sharp and fast.
+
+- [Answer her in Skaraan](yilla_trust) if skill comms >= 3
+- [Offer her your hand](yilla_trust) ; check comms 9 else yilla_scared
+- [Leave her for now]()
+
+### [Trust](yilla_trust)
+---
+Speaker: stillwater
+---
+% "You talk like a trader," she says, and almost smiles. "My aunt is Vhesk. She will skin that man." She takes your hand.
+
+- [Take her home to the Gnaw]() ; give yilla, dismiss yilla
+
+### [Not You](yilla_scared)
+---
+Speaker: stillwater
+---
+% She bares her teeth and backs into the corner. Not yet.
+
+- [Leave her for now]()
+
+### [The Obelisk](glyph_1)
+---
+Speaker: lantern_voice
+---
+% Every face of the pillar is carved, and the carvings are not decoration: they repeat, with small changes, like a sentence being conjugated.
+
+- [Read the carving](glyph_1_read) if science ; check science 6 else glyph_1_garbled
+- [Puzzle at it](glyph_1_read) ; check science 9 else glyph_1_garbled
+- [Step back]()
+
+### [The First Panel](glyph_1_read)
+---
+Speaker: lantern_voice
+---
+% A sun, drawn as a disc with a bite out of it. Then the Lantern, open. Then the valley, dark. The verb between them is TURN, and it has a tense: WHEN ASKED.
+
+- [Commit it to memory]() ; lp glyph 1
+
+### [Garbled](glyph_1_garbled)
+---
+Speaker: lantern_voice
+---
+% The shapes slide around when you try to hold them. Maybe someone else would see it.
+
+- [Step back]()
+
+### [The Carved Wall](glyph_2)
+---
+Speaker: lantern_voice
+---
+% Smooth as glass, cold as the rest of the cave is warm. The carving here is deeper and older.
+
+- [Read the carving](glyph_2_read) if science ; check science 7 else glyph_2_garbled
+- [Puzzle at it](glyph_2_read) ; check science 10 else glyph_2_garbled
+- [Step back]()
+
+### [The Second Panel](glyph_2_read)
+---
+Speaker: lantern_voice
+---
+% The caves, drawn as veins. Heat running up them toward the Lantern. A warning mark: the Lantern DRINKS the deep heat to turn. Asked wrongly, it drinks too much.
+
+- [Commit it to memory]() ; lp glyph 2
+
+### [Garbled](glyph_2_garbled)
+---
+Speaker: lantern_voice
+---
+% Veins, heat, a mark you do not recognize. It slips away.
+
+- [Step back]()
+
+### [The Hall Panel](glyph_3)
+---
+Speaker: lantern_voice
+---
+% The panel lights at your approach. The sentinels in the hall stop, and turn their faces toward it.
+
+- [Read the carving](glyph_3_read) if science ; check science 7 else glyph_3_garbled
+- [Puzzle at it](glyph_3_read) ; check science 10 else glyph_3_garbled
+- [Step back]()
+
+### [The Third Panel](glyph_3_read)
+---
+Speaker: lantern_voice
+---
+% A phrase, repeated four times with a figure standing beside it - a greeting, or a password. When you shape it aloud the sentinels go still.
+
+- [Speak it to the sentinels]() ; lp glyph 3, calm sent_1 sent_2
+
+### [Garbled](glyph_3_garbled)
+---
+Speaker: lantern_voice
+---
+% The light fades. Behind you, one of the sentinels starts walking again.
+
+- [Step back]()
+
+### [The Anteroom Panel](glyph_4)
+---
+Speaker: lantern_voice
+---
+% The last panel is the smallest, set beside the inner door at the height of a child's eyes.
+
+- [Read the carving](glyph_4_read) if science ; check science 8 else glyph_4_garbled
+- [Puzzle at it](glyph_4_read) ; check science 11 else glyph_4_garbled
+- [Step back]()
+
+### [The Fourth Panel](glyph_4_read)
+---
+Speaker: lantern_voice
+---
+% The whole instruction, at last: seat the heart, give it the sky's fire, and then ASK - the valley, the deep places, the sun - all three named, or it will choose for itself.
+
+- [Commit it to memory]() ; lp glyph 4
+
+### [Garbled](glyph_4_garbled)
+---
+Speaker: lantern_voice
+---
+% A child's handwriting in a language nobody alive speaks.
+
+- [Step back]()
+
+### [Survey Stake](marker_1)
+---
+Speaker: stillwater
+---
+% A survey stake, knocked flat by the Skaraan's crawlers. Reset it and sight it on the next one and the salt has a road.
+
+- [Reset and sight it](marker_1_set) if helm
+- [Sight it by eye](marker_1_set) ; check helm 8 else marker_off
+- [Leave it]()
+
+### [Stake Set](marker_1_set)
+---
+Speaker: stillwater
+---
+% Upright, sighted, blinking.
+
+- [Move on]() ; lp marker 1
+
+### [Survey Stake](marker_2)
+---
+Speaker: stillwater
+---
+% Another flattened stake, half buried in salt crust.
+
+- [Reset and sight it](marker_2_set) if helm
+- [Sight it by eye](marker_2_set) ; check helm 8 else marker_off
+- [Leave it]()
+
+### [Stake Set](marker_2_set)
+---
+Speaker: stillwater
+---
+% Upright, sighted, blinking.
+
+- [Move on]() ; lp marker 2
+
+### [Survey Stake](marker_3)
+---
+Speaker: stillwater
+---
+% The last stake, out by the brine pools.
+
+- [Reset and sight it](marker_3_set) if helm
+- [Sight it by eye](marker_3_set) ; check helm 8 else marker_off
+- [Leave it]()
+
+### [Stake Set](marker_3_set)
+---
+Speaker: stillwater
+---
+% Upright, sighted, blinking. From here the three lights make a line straight out of the canyon mouth.
+
+- [Move on]() ; lp marker 3
+
+### [Off True](marker_off)
+---
+Speaker: stillwater
+---
+% It will not line up. Heat shimmer off the salt, or your eye. Try again.
+
+- [Leave it]()
+
+### [Skaraan Crates](camp_crate)
+---
+Speaker: stillwater
+---
+% Salvage crates, Skaraan-stenciled. Under the fresh stencil on two of them, the old one still shows: STILLWATER DEPOT.
+
+- [Open the marked crate](camp_crate_open)
+- [Photograph the stencils](camp_crate) ; lp evidence crates
+- [Leave them]()
+
+### [The Crate](camp_crate_open)
+---
+Speaker: stillwater
+---
+% Packing foam and one hauler injector, still in its colony wrapping.
+
+- [Take the injector](camp_crate) if lp flag crate_empty < 1 ; give injector, lp flag crate_empty, lp evidence crates
+- [Leave it]()
+
+### [Skaraan Sentry](sentry)
+---
+Speaker: stillwater
+---
+% A Skaraan in a salvage rig, weapon half raised, barking something short.
+
+- [Answer in Skaraan](sentry_parley) if skill comms >= 3
+- [Show empty hands and talk](sentry_parley) ; check comms 9 else sentry_angry
+- [Back off]()
+
+### [Parley](sentry_parley)
+---
+Speaker: stillwater
+---
+% The weapon comes down. "The captain will talk. She will not like you. Go up the ramp."
+
+- [Walk on]() ; calm sentry_1 sentry_2, lp flag parley
+
+### [Wrong Answer](sentry_angry)
+---
+Speaker: stillwater
+---
+% The weapon comes all the way up.
+
+- [Back off]() ; rouse sentry_1 sentry_2
+
+### [Skaraan Deckhand](deckhand)
+---
+Speaker: stillwater
+---
+% "Captain's on the bridge. Forward. Mind your hands."
+
+- [Go forward]()
+
+### [Vhesk](vhesk)
+---
+Speaker: stillwater
+---
+% The Skaraan captain does not stand. She has a Lantern-shaped scar of carving dust on her gauntlets. "You are the ship in orbit. You want my ship for their colony. So does everyone. Say what you are paying."
+
+- [Answer in her own language](vhesk_listen) if skill comms >= 3
+- [Make your case](vhesk_listen) ; check comms 10 else vhesk_scorn
+- [Bring Yilla forward](vhesk_yilla) if holding yilla ; take yilla, signal lp_yilla_home
+- [Leave]()
+
+### [She Listens](vhesk_listen)
+---
+Speaker: stillwater
+---
+% "The heart of that tower is worth more than their whole valley. It is in my vault. Passage for everyone - and the heart stays mine. That is the price."
+
+- [Ask what she really wants](vhesk_truth) if skill comms >= 3
+- [Accept: passage for the colony, she keeps the core](vhesk_deal_core)
+- [Not yet]()
+
+### [What She Lost](vhesk_truth)
+---
+Speaker: stillwater
+---
+% She is quiet long enough that her crew look round. "My brother's child went out on the flats four nights ago and did not come back. Somebody in that colony knows. Bring her home and you can have the heart and the ship both."
+
+- [We will find her]() ; lp flag knows_yilla
+
+### [A Deal](vhesk_deal_core)
+---
+Speaker: stillwater
+---
+% "Tell them to walk up my ramp with one bag each."
+
+- [Shake on it]() ; signal lp_bargain_core
+
+### [Yilla Home](vhesk_yilla)
+---
+Speaker: stillwater
+---
+% Vhesk is out of her chair and across the deck before anybody sees her move. She holds the child a long moment, then looks at you over her head. "The vault is open to you. Take the heart. And tell your colony my ramp is down."
+
+- [Take the vault key](vhesk_grateful) ; give vhesk_key, lp flag core_returned
+
+### [Her Word](vhesk_grateful)
+---
+Speaker: stillwater
+---
+% "Skaraan pay their debts."
+
+- [Ask her to lift the colony now](vhesk_lift)
+- [Not yet - we may not need the ship]()
+
+### [The Ramp Is Down](vhesk_lift)
+---
+Speaker: stillwater
+---
+% "Then send them."
+
+- [Send them]() ; signal lp_bargain_good
+
+### [Scorn](vhesk_scorn)
+---
+Speaker: stillwater
+---
+% "Come back when you have something to say." Her crew laugh.
+
+- [Leave]()
+
+### [The Vault Crate](hold_crate)
+---
+Speaker: stillwater
+---
+% Under a tarp, packed in foam and cold to the touch: a faceted core the size of a person's chest, humming very faintly.
+
+- [Take the Lantern core](hold_crate) if lp flag core_taken < 1 ; give lantern_core, lp flag core_taken
+- [Leave it]()
+
+### [Dr Castellan](castellan)
+---
+Speaker: stillwater
+---
+% The survey lead is propped against the cave wall, grey-faced, one leg wrapped in a jacket. "Glassback. It was not even trying." She looks at your packs. "Please tell me one of you is a doctor."
+
+- [Treat the bite](castellan_saved) if holding antidote ; take antidote
+- [Look at the wound](castellan_wound) if medical
+- [What did you find down here?](castellan_found)
+- [Hold on - we will be back]()
+
+### [The Wound](castellan_wound)
+---
+Speaker: stillwater
+---
+% Neurotoxin, and not a fast one. A glassback's venom sac would give the clinic enough to make antivenom, if anyone can get one.
+
+- [Hold on - we will be back]()
+
+### [Saved](castellan_saved)
+---
+Speaker: stillwater
+---
+% The color comes back into her face over a long minute. "Thank you. Now listen - there is a way into the Lantern from down here, behind the crystal curtain at the north end. We felt the air move."
+
+- [Get them both out]() ; signal lp_survivors_saved, discover lantern, dismiss castellan brandt
+
+### [What She Found](castellan_found)
+---
+Speaker: stillwater
+---
+% "The glassbacks are coming up because the deep heat is going somewhere. Up. Toward the Lantern. It is waking, a little, every time the Skaraan dig at it."
+
+- [Back]()
+
+### [Oskar Brandt](brandt)
+---
+Speaker: stillwater
+---
+% A young technician with a cutting torch he is too scared to put down. "The glassbacks took the hauler coil, the one Harrow dropped when he ran from the Skaraan camp. Down past the vents. They sleep on anything warm."
+
+- [Thanks]()
+
+### [The Pedestal](pedestal)
+---
+Speaker: lantern_voice
+---
+% An empty socket, faceted, exactly the shape of something that was taken.
+
+- [Seat the Lantern core](pedestal) if holding lantern_core ; take lantern_core, lp flag core_seated, signal lp_core_seated
+- [Step back]()
+
+### [The Control](control)
+---
+Speaker: lantern_voice
+---
+% A console of shapes rather than keys. It is warm under your hand, and it is waiting for something.
+
+- [Call the ship for power](control) if lp flag core_seated ; signal lp_power_ready
+- [The console is awake](control_live) if lp flag powered
+- [Step back]()
+
+### [The Lantern Asks](control_live)
+---
+Speaker: lantern_voice
+---
+% Light runs up the walls and out through the roof. Every face of the Lantern is open, and it is asking - in pictures, the way the panels taught - which way to turn.
+
+- [Name the valley, the deep places and the sun](control_attuned) if lp glyph >= 4
+- [Point it at the sun and let it go](control_woken)
+- [Not yet]()
+
+### [Attuned](control_attuned)
+---
+Speaker: lantern_voice
+---
+% It turns slowly, precisely, and the shadow it throws falls over Stillwater like a hand over a candle. Far below, the caves cool.
+
+- [Watch the shadow fall]() ; signal lp_wake_true
+
+### [Woken](control_woken)
+---
+Speaker: lantern_voice
+---
+% It turns hard and fast. The valley goes dark. Under your feet the whole ridge shudders as the deep heat goes somewhere it was never meant to.
+
+- [Hold on]() ; signal lp_wake_false

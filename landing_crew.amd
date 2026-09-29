@@ -1,61 +1,80 @@
 # [Landing Party Rosters](landing_rosters)
 
-The bridge crew of the ship that answers the call - and, when the call takes them down
-to the surface, the landing party as well. You go down as the person you have been all
-evening rather than as a stranger off a list, so this file is the cast for both.
-`landing_party.amd` still holds the hand-authored bodies, used when nobody is manning
-the consoles at all.
+The bridge crew of the ship that answers Stillwater - and, when they go down to Mereth, the
+landing party as well. You go down as the person you have been all evening, so this file
+is the cast for both.
 
-`Roles:` is what an away scene GUARDS on - `if security`, `if medical`. A post without
-one falls back to the console it names, so Reyes at science satisfies `if science` and
-Kovac at engineering satisfies `if engineering` with nothing written here. Only a job
-whose name is not its seat needs saying out loud, which is why weapons carries
-`security` and nothing carries `medical`: this watch has no medic, and the medic's
-lines are forwarded to whoever is covering rather than lost.
+`Roles:` is what a scene GUARDS on (`if security`). A post without one falls back to the
+console it names, so Reyes at science satisfies `if science` with nothing written here.
 
-Kept in its own file on purpose. `crew_load_amd` parses with `amd_crew_data` and the
-story content is read with `amd_mission_data`; one file read by two parsers is a trap.
+`Skills:` is what a CHECK rolls with (`check engineering 9`): d10 plus the skill plus one
+for each crew member standing beside you who has it. A job with no number is worth 2.
+Each crew member is best at their own side quest's work, and every skill below 3 is there
+so someone else can help.
 
-## [Erebus Watch](landing_crew)
+Kept in its own file on purpose. `crew_load_amd` parses with `amd_crew_data` and the story
+content is read with `amd_mission_data`; one file read by two parsers is a trap.
+
+## [Dawnline Watch](landing_crew)
 ---
 crew
 Race: terran
 ---
-The watch that happened to be on when the relay stopped answering.
+The watch that was on when Stillwater's relay went quiet.
 
 ### [Cmdr Idris Vane](vane)
 ---
 Rank: Commander
 Console: mainscreen
+Skills: command 3, comms 1
 ---
 
 ### [Lt Anh Ferro](ferro)
 ---
 Rank: Lieutenant
 Console: comms
+Skills: comms 4, science 1
 ---
+Speaks Skaraan well enough to be insulted in it.
 
 ### [Lt Mira Okonkwo](okonkwo)
 ---
 Rank: Lieutenant
 Console: helm
+Skills: helm 4, athletics 1, engineering 1
 ---
+Has flown things worse than a grounded hauler off worse ground than Mereth.
 
 ### [Ens Petra Lund](lund)
 ---
 Rank: Ensign
 Console: weapons
 Roles: security
+Skills: security 4, athletics 2
 ---
+Notices who is lying before she notices why.
 
 ### [Lt Sam Reyes](reyes)
 ---
 Rank: Lieutenant
 Console: science
+Skills: science 4, comms 1
 ---
+Reads things nobody wrote for people.
 
 ### [CPO Dana Kovac](kovac)
 ---
-Rank: Chief
+Rank: Chief Petty Officer
 Console: engineering
+Skills: engineering 4, helm 1
 ---
+Trusts machines further than she trusts the people running them.
+
+### [Dr Imani Sato](sato)
+---
+Rank: Doctor
+Console: science
+Roles: medical
+Skills: medical 4, science 2
+---
+The ship's surgeon. Sits at science when there is nobody to stitch up.

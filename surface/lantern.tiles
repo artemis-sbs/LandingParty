@@ -1,0 +1,40 @@
+area: lantern
+title: The Lantern
+tileset: mereth
+entry: to_colony
+known: no
+beam: no
+legend:
+  g: glyphfloor
+  _: floor
+  X: pwall
+  ^: cliff
+  C: exit @to_colony
+  K: exit @to_caves
+  h: glyphfloor @hall
+  3: glyphfloor @glyph_3
+  4: glyphfloor @glyph_4
+  i: glyphfloor @inner_door
+  a: glyphfloor @anteroom
+  O: glyphfloor @core
+  p: glyphfloor @pedestal
+  c: glyphfloor @control
+---
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^XXXXXXXXXXXX^^^^^^^^^^^^^
+^^^^^^^^^^^^XXgggOOOOgggXX^^^^^^^^^^^^
+^^^^^^^^^^^XXggggOpOOggggXX^^^^^^^^^^^
+^^^^^^^^^^^XgggggOOOOggggcX^^^^^^^^^^^
+^^^^^^^^^^^XXXXXXXXiXXXXXXX^^^^^^^^^^^
+^^^^^^^^^^XXaaaaaaaaaaaaa4XX^^^^^^^^^^
+^^^^^^^^^XXaaaaaaaaaaaaaaaaXX^^^^^^^^^
+^^^^^^^^XXXXXXXXXXgXXXXXXXXXXX^^^^^^^^
+^^^^^^XXXgggggggggggggggggggggXXX^^^^^
+^^^^XXgggghhhhhhhggggghhhhhhhggg3XX^^^
+^^^^XggggghhhhhhhggggghhhhhhhgggggX^^^
+^^^^XXgggggggggggggggggggggggggggXX^^^
+^^^^^XXXXXgggggXXXXXXXXXgggggXXXXX^^^^
+^^^^^^^^^X___XXX^^^^^^^XX___X^^^^^^^^^
+^^^^^^^^^X___X^^^^^^^^^^X___X^^^^^^^^^
+^^^^^^^^^XKKKX^^^^^^^^^^X_C_X^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

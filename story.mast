@@ -1,40 +1,29 @@
-# The Landing Party
+# Dawnline
 #
-# Erebus Station has not answered in nineteen hours. Take orbit at Kaleth, beam a
-# four person team down, and find out why.
+# Stillwater, a farming colony in a canyon on the night side of Mereth, has forty minutes
+# before the sunrise reaches it. Take orbit, send people down, and find a way to get two
+# hundred and twelve colonists through the Dawnline.
 #
-# THE SHAPE. This file holds no story. Every word the players read lives in
-# `landing_party.amd`; the script's whole job is to spawn the world, notice the orbit,
-# hand each console a character, and count four signals. If a beat needs changing,
-# change the AMD.
-#
-# THE DIVISION. The main screen carries the shared view and takes no character - one
-# person's menu on everybody's screen is not a shared view. Every other console becomes
-# somebody, and comes back to its own station when the scene closes.
+# THE SHAPE. This file holds no story. The ground is `surface/*.tiles`, the things on it
+# and the people you can talk to are `world.amd`, every word said is `scenes.amd`, and the
+# mission's own vocabulary is `lp_world.py`. This script builds the world, runs the clock,
+# connects the bridge to the ground, and decides when it is over.
 
 
-# Three of the four readings unlock the ending that is not a weapon. Deliberately not
-# all four: the party should be able to reach it by more than one route through the
-# station, or "explore everything" becomes the only correct play.
-default shared LP_FACTS_NEEDED = 3
-# Beat between taking orbit and the transporter, so the orbit is a moment rather than a
-# loading screen.
-default shared LP_BEAM_DELAY = 6
-# Beam down on a timer instead of on the orbit. Headless nobody flies, so the away half
-# of the mission would never be reached by `--test` and every scene, guard and ending
-# would go unexercised while the run still reported PASS. 0 = off, which is the game.
-# Read from SETTINGS in the map body - see the note there.
-# THE TWO ANSWERS TO THE ORBIT CALL, spelled exactly as `landing_party.amd` offers them
-# (`### [Something Is Still Transmitting](orbit_call)`). A hail resolves with the chosen
-# LABEL, so these are authored text quoted in a second file; keeping them here means there
-# is ONE copy, and the route below says so out loud when an answer matches neither.
+# The mission's own vocabulary: tiles, the tally, the ending. Every function is `lp_`.
+import lp_world.py
+
+
+# How long the night lasts once the party is down, in minutes. Read from SETTINGS in the
+# map body (see there) so a profile or COSMOS_SETTINGS can shorten it for a test.
+default shared LP_DAWN_LEFT = 0
+default shared LP_OVER = False
+# The two orbit answers, spelled exactly as `world.amd` offers them.
 default shared LP_ACCEPT = "Assemble a boarding party"
-default shared LP_DECLINE = "Hold position and keep scanning"
-
-# Where Kaleth sits. The players spawn at Erebus and fly out to it.
-default shared LP_GIANT_X = 0
-default shared LP_GIANT_Y = 0
-default shared LP_GIANT_Z = 22000
+# Where Mereth sits. The players spawn near it and take orbit.
+default shared LP_WORLD_X = 0
+default shared LP_WORLD_Y = 0
+default shared LP_WORLD_Z = 16000
 
 
 #region sides
@@ -47,7 +36,7 @@ side_set_relations(lp_tsn, lp_raider, sbs.DIPLOMACY.HOSTILE)
 @media/skybox/sky-bored-alice "borealis"
 
 
-@map/landing_party "The Landing Party"
+@map/landing_party "Dawnline"
 metadata: ``` yaml
 Properties:
     Player Ships: 'gui_int_slider("$text:int;low: 1.0;high:8.0;", var= "PLAYER_COUNT")'
@@ -55,301 +44,267 @@ Properties:
 Defaults:
     CREW_SELECT: landing_crew
 ```
-    " A research station has gone quiet. Take orbit, beam down, and read the room.
+    " Forty minutes of night, two hundred and twelve colonists, and three ways out.
 
-    # `logger(file=...)` attaches its file handler ONLY when FrameContext.task is set, so
-    # it must be called from MAST - from script.py the task is None and the handler is
-    # silently never added, which is why a named log category "goes nowhere".
     logger(name="landing", file="landing.txt")
     log("map body running", "landing")
-    # Records every overlay command and every clear, so "the overlay did not go away" can
-    # be answered with what was actually on the console instead of a guess.
-    overlay_debug_log()
 
-    # A cast, so every console arrives already being somebody. By: console auto assigns.
+    # The crew, and what each of them is good at. Same file, two readers - the roster and
+    # the Skills: fields - which is why it is its own file.
     crew_load_amd("landing_crew.amd")
     shared CREW_SELECT = "landing_crew"
+    lp_crew_doc = document_get_amd_file(get_mission_dir_filename("landing_crew.amd"))
+    boarding_skills_from_amd(lp_crew_doc)
 
-    # The away module answers `if medical >= 1` by looking at the answering character's
-    # ROLES. It COMPOSES with whatever resolver is already installed rather than
-    # replacing it, so calling it is safe even beside another mod that wants one.
+    # A new game: nothing done yet.
+    lp_reset()
+    lp_install()
     boarding_metric_install()
+    lp_setup_tiles()
+    lp_areas = lp_load_areas()
+    if lp_areas != 6:
+        print(f"LandingParty: only {lp_areas} of 6 areas loaded")
 
-    lp_doc = document_get_amd_file(get_mission_dir_filename("landing_party.amd"), data_parser=amd_mission_data)
-    shared LP_SCENES = dialogue_scenes(amd_section(lp_doc, "boarding"))
+    lp_doc = document_get_amd_file(get_mission_dir_filename("world.amd"), data_parser=amd_mission_data)
+    lp_scene_doc = document_get_amd_file(get_mission_dir_filename("scenes.amd"), data_parser=amd_mission_data)
+    shared LP_SCENES = dialogue_scenes(amd_section(lp_scene_doc, "scenes"))
     shared LP_HAILS = dialogue_scenes(amd_section(lp_doc, "hails"))
-    shared LP_CAST = lifeforms_spawn(amd_section(lp_doc, "team"))
-    # What the party has worked out. Set HERE rather than at the top level so a second
-    # run of the map starts the story over instead of inheriting the last crew's notes.
-    shared LP_FACTS = []
-    shared LP_ENDING = None
+    shared LP_SIDE = amd_section(lp_doc, "side_stories")
+
+    # The ground: props, the people you can talk to, and what is out there hunting heat.
+    boarding_props_scenes(LP_SCENES)
+    boarding_props_declare(amd_section(lp_doc, "props"))
+    boarding_props_place()
+    boarding_hostiles_declare(amd_section(lp_doc, "people"))
+    boarding_hostiles_declare(amd_section(lp_doc, "hostiles"))
+    boarding_hostiles_place()
+    boarding_props_install()
+    boarding_combat_install()
+    tilemap_watch()
+
+    # The whole crew's story, on the game itself.
+    lp_grant_story(amd_section(lp_doc, "quests"))
 
     #region the system
     await prefab_spawn(prefab_gas_giant, data={
-        "name": "Kaleth",
-        "planet_radius": 4000,
-        "START_X": LP_GIANT_X, "START_Y": LP_GIANT_Y, "START_Z": LP_GIANT_Z})
-    # ASK THE WORLD, do not trust the return. `prefab_gas_giant` ends in `->END` with no
-    # `yield result`, so `await prefab_spawn(...)` hands back None - and `to_id(None)` is
-    # None, which then silently never equals anything. That is what stopped the beam down:
-    # the orbit fired, the route compared the body against None, and bailed. Only some
-    # prefabs yield a result; a role query is true for all of them.
-    shared LP_GIANT_ID = next(iter(role("gasgiant")), None)
-
-    # Say so if the body is missing. Without the giant there is no orbit, so there is no
-    # away mission at all - and the way that failed was in total silence.
-    if LP_GIANT_ID is None:
-        print("LandingParty: no gasgiant spawned - the orbit can never fire")
-
-    lp_erebus = npc_spawn(0, 0, 0, "Erebus Station", "tsn, station", "starbase_civil", "behav_station")
-    shared LP_EREBUS_ID = to_id(lp_erebus)
-
-    # EREBUS IS A PLACE YOU WALK, not only a place you talk to. The floor plan names its
-    # rooms for the scenes they open - `arrival`, `lab`, `gallery`, `shelter` - so the
-    # station and `landing_party.amd` share one vocabulary and nothing has to map between
-    # them. `starbase_civil` has no stock interior, which is why a plan is authored at all.
-    lp_plan = media_read_relative_file("erebus.grid")
-    if lp_plan is not None:
-        grid_merge_ascii(lp_plan, "LandingParty", "starbase_civil")
-        boarding_site_build(lp_erebus, layout="erebus")
-        # Rooms start noticing. What entering one MEANS is this mission's business, and
-        # it is the route at the end of this file.
-        boarding_rooms_watch()
-        log(f"erebus interior: {len(grid_objects(LP_EREBUS_ID))} grid objects", "landing")
+        "name": "Mereth",
+        "planet_radius": 3500,
+        "START_X": LP_WORLD_X, "START_Y": LP_WORLD_Y, "START_Z": LP_WORLD_Z})
+    shared LP_WORLD_ID = next(iter(role("gasgiant")), None)
+    if LP_WORLD_ID is None:
+        print("LandingParty: no planet spawned - the orbit can never fire")
     #endregion
 
     await task_schedule(spawn_players)
     await task_schedule(docking_standard_player_gas_giant)
-
-    # Science can read the station from here. That is the point of the bridge half: the
-    # people who can SEE are not the people who can ACT.
     for lp_ship in to_object_list(role("__player__")):
-        link(lp_ship.id, "extra_scan_source", LP_EREBUS_ID)
-        if LP_GIANT_ID is not None:
-            link(lp_ship.id, "extra_scan_source", LP_GIANT_ID)
+        if LP_WORLD_ID is not None:
+            link(lp_ship.id, "extra_scan_source", LP_WORLD_ID)
 
-    game_end_condition_add(destroyed_all(role("__player__")), "All ships lost. Erebus is still cold.", False)
+    game_end_condition_add(destroyed_all(role("__player__")), "All ships lost. Stillwater faces the dawn alone.", False)
 
     task_schedule(lp_picket)
+
     # settings_get_defaults(), not a bare `default shared`: settings.yaml, a profile and
-    # the headless COSMOS_SETTINGS override all feed the SETTINGS table, and none of them
-    # seeds a MAST shared variable - so a `default shared` flag reads its own default
-    # forever and the override looks ignored.
+    # COSMOS_SETTINGS all feed the SETTINGS table, and none of them seeds a shared.
     lp_settings = settings_get_defaults()
+    shared LP_DAWN_LEFT = int(lp_settings.get("LP_DAWN_MINUTES", 40) or 40) * 60
+    if lp_settings.get("LP_CHECK_MODE", "dice") == "flat":
+        boarding_checks_mode("flat")
+    lp_seed = lp_settings.get("LP_SEED", 0)
+    if lp_seed:
+        boarding_checks_seed(lp_seed)
     lp_auto = lp_settings.get("LP_AUTO_BEAM", 0)
     ->END if lp_auto is None or lp_auto <= 0
 
-    # Development only. Reaching the away half without an orbit, so a headless run can
-    # walk the scenes.
+    # Development only: reach the ground without flying to the planet, so a headless run
+    # exercises the away half.
     await delay_sim(lp_auto)
     signal_emit("lp_beam_down")
     ->END
 
 
-# Somebody is already here, and it is not a rescue. Small on purpose - this mission is
-# not a fleet action, and a picket that wipes the bridge never gets to the story.
+# The Gnaw's escort. While it is near Mereth it jams the transporter - the party walks, or
+# the bridge deals with it. Small on purpose: this is not a fleet action.
 === lp_picket
-    await delay_sim(20)
-    lp_fleet_pos = Vec3.rand_in_sphere(8000, 14000, False, True)
-    lp_fleet_data = ~~{"race": "skaraan", "fleet_difficulty": int(max(0, DIFFICULTY - 3)), "START_X": lp_fleet_pos.x, "START_Y": lp_fleet_pos.y, "START_Z": lp_fleet_pos.z}~~
+    await delay_sim(90)
+    lp_fleet_pos = Vec3.rand_in_sphere(6000, 9000, False, True)
+    lp_fleet_data = {"race": "skaraan", "fleet_difficulty": int(max(0, DIFFICULTY - 4)), "START_X": LP_WORLD_X + lp_fleet_pos.x, "START_Y": 0, "START_Z": LP_WORLD_Z + lp_fleet_pos.z}
     prefab_spawn(prefab_fleet_raider, lp_fleet_data)
+---lp_picket_watch
+    await delay_sim(5)
+    ->END if LP_OVER
+    lp_jammers = 0
+    for lp_raider_obj in to_object_list(role("raider")):
+        if LP_WORLD_ID is not None and sbs.distance_id(lp_raider_obj.id, LP_WORLD_ID) < 15000:
+            lp_jammers += 1
+    if lp_jammers > 0 and not boarding_transport_jammed():
+        boarding_transport_jam(True, "A Skaraan raider in orbit is jamming the transporter")
+    if lp_jammers == 0 and boarding_transport_jammed():
+        boarding_transport_jam(False)
+    jump lp_picket_watch
+
+
+# The Dawnline. Beats at 30, 20, 10, 5 and 1 minutes left; at zero the ship lifts who it can.
+=== lp_dawn_clock
+    lp_beats = [1800, 1200, 600, 300, 60]
+---lp_dawn_tick
+    await delay_sim(5)
+    ->END if LP_OVER
+    LP_DAWN_LEFT = LP_DAWN_LEFT - 5
+    for lp_beat in lp_beats:
+        if LP_DAWN_LEFT <= lp_beat and LP_DAWN_LEFT > lp_beat - 5:
+            lp_min = lp_beat // 60
+            message_send(f"The Dawnline is {lp_min} minutes from Stillwater.", to="boarding", kind="alert", sender="Stillwater")
+            comms_broadcast(role("__player__"), f"Dawnline: {lp_min} minutes to Stillwater.", "#fa4")
+    jump lp_dawn_tick if LP_DAWN_LEFT > 0
+    task_schedule(lp_finish, {"lp_trigger": "dawn"})
     ->END
 
 
 #############################################################################
-# Routes. These live at the END of the file: labels fall through, routes do not,
-# so anything added above this line must not run on into them.
+# Routes. At the END of the file: labels fall through, routes do not, so anything
+# added above this line must not run on into them.
 #############################################################################
 
-# Taking orbit is the away mission's starting gun. The library deliberately hands out
-# nothing but the orbit and lets the mission decide what it means.
+# Taking orbit is the starting gun. The hail is awaitable and server arbitrated, so with
+# six consoles the answer still fires once.
 //shared/signal/ship_orbiting
-    ->END if boarding_is_open()
-    # The ROLE, not an id. It survives the giant being respawned or a second body being
-    # added later, and it does not depend on a prefab handing anything back.
+    ->END if LP_OVER
     ->END if not has_role(ORBIT_BODY_ID, "gasgiant")
-    # ONE hail per arrival. `//shared/signal` is once per EMIT, not once per mission, and
-    # the docking brain re-fires ship_orbiting on a re-approach.
     ->END if get_inventory_value(ORBIT_SHIP_ID, "LP_HAILED", False)
+    ->END if boarding_invitation() is not None
     set_inventory_value(ORBIT_SHIP_ID, "LP_HAILED", True)
-    log(f"orbit: body={ORBIT_BODY_ID}, hailing", "landing")
-
-    # Beaming down is a DECISION, not a consequence of flying somewhere. The hail is
-    # awaitable and server arbitrated, so with six consoles the answer still fires once.
     lp_call = await hail_ask(ORBIT_SHIP_ID, scene="orbit_call", scenes=LP_HAILS)
     ->END if lp_call is None
     log(f"orbit hail answered: {lp_call.value}", "landing")
-
-    # MATCHED AGAINST THE .amd, NOT AGAINST A REMEMBERED PHRASE. `hail_ask` resolves with
-    # the chosen LABEL, so this comparison is a copy of authored text living in a second
-    # file - and when the away addon became the boarding addon, `landing_party.amd` was
-    # renamed to "Assemble a boarding party" and this line was not. It then matched
-    # nothing: the else branch re-armed the hail, no party was ever offered, and because
-    # `boarding_relevant()` correctly hides the tile when there is no party, the whole
-    # failure surfaced as "the ePADD has no Boarding Party app". Nothing raised, nothing
-    # logged, and the hail echo said "answered" - the last place anybody would look.
-    #
-    # `LP_ACCEPT` is now the only copy, it sits beside nothing else, and the mismatch is
-    # LOUD: an answer that is neither authored choice says so in landing.txt instead of
-    # falling quietly into "not now".
     if lp_call.value == LP_ACCEPT:
-        await delay_sim(LP_BEAM_DELAY)
+        await delay_sim(4)
         signal_emit("lp_beam_down")
     else:
-        if lp_call.value is not None and lp_call.value != LP_DECLINE:
-            log(f"UNKNOWN orbit answer {lp_call.value!r} - it matches neither "
-                f"{LP_ACCEPT!r} nor {LP_DECLINE!r}, so nobody will ever beam down. "
-                f"landing_party.amd and story.mast have drifted.", "landing", "warning")
-        # Not now. Re-arm, so leaving orbit and coming back offers the call again rather
-        # than stranding the mission on one declined hail.
+        # Not now. Leaving orbit and coming back offers the call again.
         set_inventory_value(ORBIT_SHIP_ID, "LP_HAILED", False)
     ->END
 
 
-# //shared/signal, not //signal: this hands out characters and opens the scene, and with
-# six consoles a //signal body would do every bit of that six times over.
+# Open the party. Each console beams down from its ePADD as its own crew member, onto the
+# landing ridge; the crew console draws the ground as a tile map.
 //shared/signal/lp_beam_down
-    ->END if LP_SCENES is None or LP_CAST is None
-    ->END if boarding_is_open()
+    ->END if boarding_invitation() is not None
     lp_ship = next(iter(role("__player__")), None)
     ->END if lp_ship is None
-    lp_roster = list(LP_CAST.values())
-    ->END if len(lp_roster) == 0
-
-    # Open the beat BEFORE anybody can be looking at it, so the first build already has
-    # a line to draw.
-    boarding_scene_begin(LP_SCENES, "arrival", speaker="outpost")
-
-    # OFFER the party rather than deal it. Nobody moves until a console opens Boarding Party
-    # on its ePADD and chooses somebody - a crew member should not find themselves on a
-    # planet playing whoever a loop reached. The consoles that stay behind simply stay
-    # at their posts, which also ends the old choice between doubling consoles up and
-    # stranding characters nobody could play.
-    #
-    # THE PARTY IS THE CREW when the bridge has one. You go down as the person you have
-    # been all evening, and each console has its own place held - so beaming down is a
-    # confirmation rather than a casting call. A console that never picked a crew
-    # member is assigned one on the way, the way the picker would have.
-    # `site=` is the whole of the spatial half at this end. The shipped BEAM DOWN button
-    # reads it off the invitation, so each console that goes down also gets a body on the
-    # station and the crew console that draws it - without this mission touching the app.
-    lp_invite = boarding_invite_crew(lp_ship, title="The Outpost", site=LP_EREBUS_ID)
-    lp_derived = len(lp_invite.get("roster") or []) > 0
-
-    # No crew at all: fall back to the cast this mission authored. It is a deliberate
-    # cast, with its own faces and job words, so it is the right answer whenever there
-    # is nobody at the consoles to derive a party from.
-    if not lp_derived:
-        boarding_invite(lp_ship, lp_roster, title="The Outpost", site=LP_EREBUS_ID)
-
-    # The old hand-over, for a bridge running the LEGACY crew console: it deals and
-    # morphs, as it always did. Harmless beside the invitation - whoever it seats is
-    # simply no longer on the open roster.
-    #
-    # Gated on the SAME setting the addon's consumer is gated on
-    # (`//shared/signal/boarding_begin if SETTINGS.get("BOARDING_LEGACY_CONSOLE")`), so
-    # the emit and the route agree. It used to ask `gui_app_mode_is_on()`, which the
-    # library DELETED when ePADD became always-on - so every beam-down raised
-    # `NameError: gui_app_mode_is_on is not defined` and the mission reported FAIL.
-    # Pre-existing since this mission's first commit; nothing caught it because a
-    # vanished MAST global fails at runtime, not at compile.
-    if SETTINGS.get("BOARDING_LEGACY_CONSOLE", False):
-        lp_hand_over = ~~{"BOARDING_SHIP": lp_ship, "BOARDING_ROSTER": lp_roster}~~
-        signal_emit("boarding_begin", lp_hand_over)
-
-    log(f"beam down: scene={boarding_scene()} crew={lp_derived} cast={len(lp_roster)}",
-        "landing")
+    lp_invite = boarding_invite_crew(lp_ship, title="Stillwater", area="ridge")
+    if len(lp_invite.get("roster") or []) == 0:
+        print("LandingParty: no crew at the consoles to send down")
+    task_schedule(lp_dawn_clock)
+    log(f"beam down: roster={len(lp_invite.get('roster') or [])}", "landing")
+    # Development only: send every console down without anyone pressing BEAM DOWN, so an
+    # engine run can look at the ground with no mouse. `var.LP_AUTO_GO=1`.
+    if SETTINGS.get("LP_AUTO_GO", 0):
+        task_schedule(lp_auto_go, {"lp_go_ship": lp_ship})
     ->END
 
 
-# The four readings. One route each rather than one route with a token, because a
-# `signal` outcome carries no data - the NAME is the whole message.
-//shared/signal/lp_cold
-    task_schedule(lp_learn, {"lp_fact": "cold"})
-    ->END
-
-//shared/signal/lp_gentle
-    task_schedule(lp_learn, {"lp_fact": "gentle"})
-    ->END
-
-//shared/signal/lp_willing
-    task_schedule(lp_learn, {"lp_fact": "willing"})
-    ->END
-
-//shared/signal/lp_sample
-    task_schedule(lp_learn, {"lp_fact": "sample"})
-    ->END
-
-
-# Record one reading, and open the other ending once enough of them are in.
-#
-# `briefed` is a ROLE on the away characters rather than a new metric, so the guard in
-# the AMD (`if briefed >= 1`) is answered by the resolver the away module already
-# installed. No second resolver, and none of the composition risk that comes with one.
-=== lp_learn
-    ->END if lp_fact in LP_FACTS
-    LP_FACTS.append(lp_fact)
-    ->END if len(LP_FACTS) < LP_FACTS_NEEDED
-    for lp_body in to_object_list(boarding_team()):
-        add_role(lp_body, "briefed")
+=== lp_auto_go
+    await delay_sim(2)
+    for lp_go_cid in sorted(linked_to(lp_go_ship, "consoles")):
+        if boarding_beam_down(lp_go_cid) is not None:
+            boarding_go_down(lp_go_cid)
+    ->END if not SETTINGS.get("LP_PROBE_PICK", 0)
+    # Development only (`var.LP_PROBE_PICK=1`): open the drone's scene and, a while
+    # later, pick its first choice through the same signal the button sends - an engine
+    # check of the Act redraw that needs no mouse.
+    await delay_sim(6)
+    for lp_go_cid in sorted(linked_to(lp_go_ship, "consoles")):
+        boarding_interact(lp_go_cid, "drone")
+    for lp_probe_n in range(2):
+        await delay_sim(10)
+        for lp_go_cid in sorted(linked_to(lp_go_ship, "consoles")):
+            signal_emit("boarding_pick", {"SIGNAL_CLIENT_ID": lp_go_cid, "i": "0", "seq": str(boarding_seq_for(lp_go_cid)), "SIGNAL_CHOICE": "probe"})
+            log(f"probe pick {lp_probe_n} at tick {sim.time_tick_counter} for {lp_go_cid}: scene now {boarding_scene(boarding_channel_of(lp_go_cid))} rev {boarding_reader_revision(lp_go_cid)}", "landing")
     ->END
 
 
-//shared/signal/lp_end_home
-    LP_ENDING = "home"
-    task_schedule(lp_finish)
-    ->END
-
-//shared/signal/lp_end_burn
-    LP_ENDING = "burn"
-    task_schedule(lp_finish)
+# Each crew member picks up their own side story when they land.
+//shared/signal/boarding_went_down
+    ->END if LP_SIDE is None
+    boarding_quests_grant(LP_SIDE)
     ->END
 
 
-# End the mission, but not until the team is actually back. The ending is CHOSEN while
-# the away scene is still open, and tearing the game down under a console that is still
-# painting the last beat means nobody reads the end of their own story.
+//shared/signal/lp_met_magistrate
+    lp_reveal_ways()
+    # Anyone who has not claimed their side story by now is not coming.
+    boarding_quests_open_unclaimed(LP_SIDE)
+    ->END
+
+
+# The seated core asks the bridge for power.
+//shared/signal/lp_power_ready
+    ->END if lp_is("powered")
+    lp_ship = next(iter(role("__player__")), None)
+    ->END if lp_ship is None
+    await hail_ask(lp_ship.id, scene="lantern_power", scenes=LP_HAILS)
+    ->END
+
+
+# Everyone on the ground is down. Nobody is stranded: they come round at the edge of the
+# area, away from what dropped them - and the night is two minutes shorter.
+//shared/signal/boarding_party_down
+    ->END if LP_OVER
+    await delay_sim(8)
+    for lp_down in boarding_team():
+        if boarding_is_down(lp_down):
+            lp_down_at = tilemap_where(lp_down)
+            boarding_revive(lp_down, 1)
+            if lp_down_at is not None:
+                lp_entry = tilemap_entry(lp_down_at[0])
+                tilemap_place(lp_down, lp_down_at[0], lp_entry[0], lp_entry[1])
+    LP_DAWN_LEFT = max(60, LP_DAWN_LEFT - 120)
+    message_send("You come to at the edge of the site, bruised. Two minutes of night are gone.", to="boarding", kind="alert", sender="Stillwater")
+    ->END
+
+
+# The ways out. Each one ends the night.
+//shared/signal/lp_launch
+    task_schedule(lp_finish, {"lp_trigger": "launch"})
+    ->END
+
+//shared/signal/lp_wake_true
+    signal_emit("lp_wake")
+    task_schedule(lp_finish, {"lp_trigger": "wake_true"})
+    ->END
+
+//shared/signal/lp_wake_false
+    signal_emit("lp_wake")
+    task_schedule(lp_finish, {"lp_trigger": "wake_false"})
+    ->END
+
+//shared/signal/lp_bargain_good
+    signal_emit("lp_bargain")
+    task_schedule(lp_finish, {"lp_trigger": "bargain_good"})
+    ->END
+
+//shared/signal/lp_bargain_core
+    signal_emit("lp_bargain")
+    task_schedule(lp_finish, {"lp_trigger": "bargain_core"})
+    ->END
+
+
+# End it - but let the party read the end of their own scene first.
 === lp_finish
-    await delay_sim(1)
-    jump lp_finish if boarding_is_open()
-    # And a beat after that, so the consoles have rebuilt on the bridge first.
-    await delay_sim(3)
-
-    if LP_ENDING == "home":
-        START_TEXT = "Erebus is warm again, and the thing that was on the coolant loop is ninety kilometres down where it belongs. Three survivors, and a record of what it was."
-        # The sting comes out of the bank that is PLAYING, so a game scored to anything
-        # other than the stock soundtrack still ends on its own music.
+    ->END if LP_OVER
+    LP_OVER = True
+    lp_end = lp_ending(lp_trigger)
+    signal_emit("lp_saved")
+    log(f"finish: {lp_end[0]} saved={lp_end[3]} lantern={lp_end[4]} glyphs={lp_end[5]} sides={lp_end[6]}", "landing")
+    await delay_sim(4)
+    START_TEXT = lp_ending_text()
+    if lp_end[3] > 100:
         music_play_sting("victory")
     else:
-        START_TEXT = "Erebus is warm again. Three survivors, a clean coolant loop, and no record of what any of it was."
-        music_play_sting("victory")
-
+        music_play_sting("failure")
     GAME_STARTED = False
     GAME_ENDED = True
-    log(f"finish: ending={LP_ENDING} facts={LP_FACTS}", "landing")
     signal_emit("show_game_results", None)
-    ->END
-
-
-#############################################################################
-# WALKING INTO A ROOM IS ARRIVING IN A SCENE.
-#
-# The floor plan names its rooms for the scene keys in landing_party.amd, so this
-# is the whole join: the room you entered IS the beat to open. No lookup table, and
-# adding a room to the station is adding a location to the story.
-#
-# `//shared/signal`, not `//signal`: walking into the lab is one event in the world.
-# On a plain //signal route a four-console party would open the beat four times and
-# re-roll its line three of them.
-#############################################################################
-
-//shared/signal/boarding_entered
-    # A room the story has nothing to say about - a junction, a corridor somebody named -
-    # is just somewhere to stand. Not an error, and not worth a log line.
-    ->END if LP_SCENES is None
-    ->END if BOARDING_ROOM_NAME not in LP_SCENES
-    # Already here. Re-opening would re-roll the line the party is reading.
-    ->END if boarding_scene() == BOARDING_ROOM_NAME
-    boarding_scene_begin(LP_SCENES, BOARDING_ROOM_NAME, speaker="outpost")
-    log(f"walked into {BOARDING_ROOM_NAME}", "landing")
     ->END

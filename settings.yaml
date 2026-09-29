@@ -8,6 +8,14 @@ EPADD_ENABLED: true
 # a headless --test sets it so the away half is actually exercised.
 LP_AUTO_BEAM: 0
 
+# Minutes of night left once the party is on the ground.
+LP_DAWN_MINUTES: 40
+
+# Skill checks: "dice" (d10 + skill + help) or "flat" (5 + skill + help, no luck).
+LP_CHECK_MODE: dice
+# Fix the dice for a repeatable run. 0 = unseeded.
+LP_SEED: 0
+
 PLAYER_LIST:
     -   name: "Artemis"
         side: "tsn"
