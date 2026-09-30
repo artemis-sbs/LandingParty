@@ -21,5 +21,10 @@ kinds:
   wall:                   look=wall_metal
   pwall:                  look=wall_ancient
   hull:                   look=hull_metal
+  # Aboard the Gnaw: a room reads as a room because its deck does.
+  bridgedeck:  walk see   look=floor_panel
+  aisle:       walk see   look=floor_corridor
+  berth:       walk see   look=floor_tiles
+  holddeck:    walk see   look=floor_hazard
   # A way out, drawn as one: bright chevrons, so nobody has to guess where it is.
   exit:        walk see   look=exit

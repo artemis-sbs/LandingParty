@@ -6,24 +6,27 @@ known: no
 beam: no
 legend:
   -: deck
+  =: aisle
+  _: bridgedeck
   H: hull
+  #: wall
   F: exit @to_flats
-  b: deck @bridge
-  v: deck @vhesk_seat
+  b: bridgedeck @bridge
+  v: bridgedeck @vhesk_seat
   d: deck @hold_door
-  o: deck @hold
-  q: deck @quarters
+  o: holddeck @hold
+  q: berth @quarters
 ---
 HHHHHHHHHHHHHHHHHHHHHHHHHH
-HHHHHHHH----bbbb----HHHHHH
-HHHHHH-------bvb-------HHH
-HHHHH----------------HH-HH
-HHHH---HHHHH--HHHHH-----HH
-HHH----HqqqH--HooooH----HH
-HHH----HqqqH--HooooH----HH
-HHH-----------HHdHHH----HH
-HHHH--------------------HH
-HHHHH------------------HHH
-HHHHHHHH----------HHHHHHHH
+HHHHHHHH____bbbb____HHHHHH
+HHHHHH_______bvb_______HHH
+HHHHH-------====-----HH-HH
+HHHH---#####==#####-----HH
+HHH----#qqq#==#oooo#----HH
+HHH----#qqq#==#oooo#----HH
+HHH---------==##d###----HH
+HHHH--------====--------HH
+HHHHH-------====-------HHH
+HHHHHHHH----====--HHHHHHHH
 HHHHHHHHHHH-FFFF-HHHHHHHHH
 HHHHHHHHHHHHHHHHHHHHHHHHHH

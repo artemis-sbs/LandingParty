@@ -867,6 +867,9 @@ GROUND_LOOKS = {
     "stone_tiles": "glyphfloor", "vent": "vent", "rock": "rock", "cliff": "cliff",
     "water": "brine", "crystal": "crystal", "wall_metal": "wall",
     "wall_ancient": "pwall", "hull_metal": "hull", "exit": "exit", "lava": "heat",
+    # the Gnaw's rooms: without a pack they are all just deck
+    "floor_panel": "floor", "floor_corridor": "floor", "floor_tiles": "floor",
+    "floor_hazard": "deck",
 }
 
 #: Shared key -> drawing, or (drawing, tint). The same vocabulary every Cosmos tile pack
@@ -896,6 +899,12 @@ KEYS = {
     "prop:glyph_panel": "panel", "prop:pedestal": "pedestal",
     "prop:pedestal_lit": "pedestal_lit", "prop:ancient_console": "console",
     "prop:vault_door": "door_shut", "prop:vault_door_open": "glyphfloor",
+    "prop:door_station": "door_shut",
+    # the Gnaw's furnishings
+    "prop:console_bank": "console", "prop:console_station": "console", "prop:bunk": "bed",
+    "prop:desk": "terminal", "prop:crate_ammo": "crate", "prop:crate_shield": "crate",
+    "prop:crate_wide": "crate", "prop:barrel": "crate", "prop:oxygen_tank": "part",
+    "prop:oxygen_tank_large": "part", "prop:cart_loaded": "crate",
     # hint badges
     "ui:hint_new": "hint_new", "ui:hint_lead": "hint_lead", "ui:hint_way": "hint_way",
 }

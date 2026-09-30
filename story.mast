@@ -210,6 +210,16 @@ Defaults:
     for lp_go_cid in sorted(linked_to(lp_go_ship, "consoles")):
         if boarding_beam_down(lp_go_cid) is not None:
             boarding_go_down(lp_go_cid)
+    # Development only (`var.LP_PROBE_AREA=gnaw`, optionally `var.LP_PROBE_AT=13,4`):
+    # stand everyone in another area, so an engine run can look at it with no mouse.
+    lp_probe_area = SETTINGS.get("LP_PROBE_AREA", "")
+    if lp_probe_area:
+        await delay_sim(1)
+        lp_probe_at = [int(v) for v in str(SETTINGS.get("LP_PROBE_AT", "")).replace(",", " ").split()]
+        if len(lp_probe_at) != 2:
+            lp_probe_at = tilemap_entry(lp_probe_area)
+        for lp_go_cid in sorted(linked_to(lp_go_ship, "consoles")):
+            tilemap_place(boarding_me(lp_go_cid), lp_probe_area, lp_probe_at[0], lp_probe_at[1])
     ->END if not SETTINGS.get("LP_PROBE_PICK", 0)
     # Development only (`var.LP_PROBE_PICK=1`): open the drone's scene and, a while
     # later, pick its first choice through the same signal the button sends - an engine

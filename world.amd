@@ -348,7 +348,7 @@ Scene: control
 ---
 Area: gnaw
 Mark: hold_door
-Sprite: prop:hatch
+Sprite: prop:door_station
 Open sprite: prop:doorframe
 Blocks: yes
 Opens with: key vhesk_key, cut
@@ -361,6 +361,126 @@ At: 16, 5
 Sprite: prop:crate
 Blocks: yes
 Scene: hold_crate
+---
+
+### [Helm, port](gnaw_helm_port)
+---
+Area: gnaw
+At: 9, 1
+Sprite: prop:console_bank
+Blocks: yes
+---
+
+### [Helm, starboard](gnaw_helm_starboard)
+---
+Area: gnaw
+At: 18, 1
+Sprite: prop:console_bank
+Blocks: yes
+---
+
+### [Comms station](gnaw_comms)
+---
+Area: gnaw
+At: 7, 2
+Sprite: prop:terminal
+Blocks: yes
+---
+
+### [Scanner station](gnaw_scanner)
+---
+Area: gnaw
+At: 21, 2
+Sprite: prop:console_station
+Blocks: yes
+---
+
+### [Bunk](gnaw_bunk)
+---
+Area: gnaw
+At: 9, 5
+Sprite: prop:bunk
+Blocks: yes
+---
+
+### [Desk](gnaw_desk)
+---
+Area: gnaw
+At: 8, 6
+Sprite: prop:desk
+Blocks: yes
+---
+
+### [Ammunition crate](gnaw_hold_ammo)
+---
+Area: gnaw
+At: 15, 5
+Sprite: prop:crate_ammo
+Blocks: yes
+---
+
+### [Shield crate](gnaw_hold_shield)
+---
+Area: gnaw
+At: 18, 5
+Sprite: prop:crate_shield
+Blocks: yes
+---
+
+### [Barrel](gnaw_hold_barrel)
+---
+Area: gnaw
+At: 18, 6
+Sprite: prop:barrel
+Blocks: yes
+---
+
+### [Barrels](gnaw_barrels)
+---
+Area: gnaw
+At: 3, 5
+Sprite: prop:barrel
+Blocks: yes
+---
+
+### [Salvage crate](gnaw_salvage)
+---
+Area: gnaw
+At: 3, 6
+Sprite: prop:crate
+Blocks: yes
+---
+
+### [Air tank](gnaw_tank)
+---
+Area: gnaw
+At: 23, 5
+Sprite: prop:oxygen_tank_large
+Blocks: yes
+---
+
+### [Spare tank](gnaw_tank_2)
+---
+Area: gnaw
+At: 23, 6
+Sprite: prop:oxygen_tank
+Blocks: yes
+---
+
+### [Cargo pallet](gnaw_pallet)
+---
+Area: gnaw
+At: 5, 9
+Sprite: prop:crate_wide
+Blocks: yes
+---
+
+### [Loaded cart](gnaw_cart)
+---
+Area: gnaw
+At: 21, 9
+Sprite: prop:cart_loaded
+Blocks: yes
 ---
 
 ## [People](people)

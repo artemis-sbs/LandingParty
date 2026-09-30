@@ -23,13 +23,34 @@
   "exit": {
    "cell": "ground:exit"
   },
+  "floor_corridor": {
+   "cell": "ground:floor_corridor",
+   "variants": [
+    "ground:floor_corridor_v2"
+   ]
+  },
   "floor_grate": {
    "cell": "ground:floor_grate"
+  },
+  "floor_hazard": {
+   "cell": "ground:floor_hazard"
   },
   "floor_metal": {
    "cell": "ground:floor_metal",
    "variants": [
     "ground:floor_metal_v2"
+   ]
+  },
+  "floor_panel": {
+   "cell": "ground:floor_panel",
+   "variants": [
+    "ground:floor_panel_v2"
+   ]
+  },
+  "floor_tiles": {
+   "cell": "ground:floor_tiles",
+   "variants": [
+    "ground:floor_tiles_v2"
    ]
   },
   "hull_metal": {
@@ -336,7 +357,34 @@
    ],
    "sheet": "sheet"
   },
+  "ground:floor_corridor": {
+   "rect": [
+    1408,
+    0,
+    1536,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:floor_corridor_v2": {
+   "rect": [
+    1536,
+    0,
+    1664,
+    128
+   ],
+   "sheet": "sheet"
+  },
   "ground:floor_grate": {
+   "rect": [
+    1664,
+    0,
+    1792,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:floor_hazard": {
    "rect": [
     1664,
     0,
@@ -355,6 +403,42 @@
    "sheet": "sheet"
   },
   "ground:floor_metal_v2": {
+   "rect": [
+    1536,
+    0,
+    1664,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:floor_panel": {
+   "rect": [
+    1408,
+    0,
+    1536,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:floor_panel_v2": {
+   "rect": [
+    1536,
+    0,
+    1664,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:floor_tiles": {
+   "rect": [
+    1408,
+    0,
+    1536,
+    128
+   ],
+   "sheet": "sheet"
+  },
+  "ground:floor_tiles_v2": {
    "rect": [
     1536,
     0,
@@ -561,6 +645,15 @@
    ],
    "sheet": "sheet"
   },
+  "prop:barrel": {
+   "rect": [
+    1152,
+    256,
+    1280,
+    384
+   ],
+   "sheet": "sheet"
+  },
   "prop:beacon": {
    "rect": [
     896,
@@ -597,7 +690,43 @@
    ],
    "sheet": "sheet"
   },
+  "prop:bunk": {
+   "rect": [
+    1024,
+    384,
+    1152,
+    512
+   ],
+   "sheet": "sheet"
+  },
+  "prop:cart_loaded": {
+   "rect": [
+    1152,
+    256,
+    1280,
+    384
+   ],
+   "sheet": "sheet"
+  },
   "prop:console": {
+   "rect": [
+    1792,
+    256,
+    1920,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:console_bank": {
+   "rect": [
+    1792,
+    256,
+    1920,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:console_station": {
    "rect": [
     1792,
     256,
@@ -615,11 +744,38 @@
    ],
    "sheet": "sheet"
   },
+  "prop:crate_ammo": {
+   "rect": [
+    1152,
+    256,
+    1280,
+    384
+   ],
+   "sheet": "sheet"
+  },
   "prop:crate_medical": {
    "rect": [
     1280,
     256,
     1408,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:crate_shield": {
+   "rect": [
+    1152,
+    256,
+    1280,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:crate_wide": {
+   "rect": [
+    1152,
+    256,
+    1280,
     384
    ],
    "sheet": "sheet"
@@ -639,6 +795,24 @@
     0,
     1920,
     128
+   ],
+   "sheet": "sheet"
+  },
+  "prop:desk": {
+   "rect": [
+    1664,
+    256,
+    1792,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:door_station": {
+   "rect": [
+    1408,
+    256,
+    1536,
+    384
    ],
    "sheet": "sheet"
   },
@@ -711,6 +885,24 @@
     384,
     1408,
     512
+   ],
+   "sheet": "sheet"
+  },
+  "prop:oxygen_tank": {
+   "rect": [
+    1920,
+    256,
+    2048,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "prop:oxygen_tank_large": {
+   "rect": [
+    1920,
+    256,
+    2048,
+    384
    ],
    "sheet": "sheet"
   },

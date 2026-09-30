@@ -16,10 +16,10 @@ LP_CHECK_MODE: dice
 # Fix the dice for a repeatable run. 0 = unseeded.
 LP_SEED: 0
 
-# Art sets drawn over the mission's own `builtin` art, in order (see sbs_utils
-# tilemap_art.py). `frontier` is the Cosmos-Tiles frontier pack; without the pack the
-# builtin art is used.
-TILE_ART: frontier
+# Art sets drawn over the mission's own `builtin` art, in order, a later set winning key
+# by key (see sbs_utils tilemap_art.py). `frontier` (the surface) and `station` (the Gnaw's
+# decks and furniture) are Cosmos-Tiles packs; without them the builtin art is used.
+TILE_ART: frontier, station
 
 PLAYER_LIST:
     -   name: "Artemis"
