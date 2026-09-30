@@ -882,8 +882,8 @@ KEYS = {
     "fig:junker_m": ("colonist", "#f96"), "fig:junker_f": "colonist",
     "fig:medic_m": "survivor", "fig:soldier_m": ("colonist", "#9ab"),
     "fig:soldier_f": ("colonist", "#9ab"), "fig:hunter_f": "colonist",
-    "fig:skaraan": "skaraan", "fig:skaraan_young": "youngster",
-    "fig:skaraan_chief": "vhesk", "fig:alien": "skaraan", "fig:glassback": "glassback",
+    "fig:reptile": "skaraan", "fig:reptile_young": "youngster",
+    "fig:reptile_chief": "vhesk", "fig:alien": "skaraan", "fig:glassback": "glassback",
     "fig:robot_war": "sentinel", "fig:robot_f": "sentinel",
     # things, and their other states
     "prop:survey_marker": "marker", "prop:survey_marker_lit": "marker_set",

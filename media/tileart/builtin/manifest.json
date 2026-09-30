@@ -211,6 +211,33 @@
    ],
    "sheet": "sheet"
   },
+  "fig:reptile": {
+   "rect": [
+    256,
+    256,
+    384,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "fig:reptile_chief": {
+   "rect": [
+    512,
+    256,
+    640,
+    384
+   ],
+   "sheet": "sheet"
+  },
+  "fig:reptile_young": {
+   "rect": [
+    384,
+    256,
+    512,
+    384
+   ],
+   "sheet": "sheet"
+  },
   "fig:robot_f": {
    "rect": [
     768,
@@ -225,33 +252,6 @@
     768,
     256,
     896,
-    384
-   ],
-   "sheet": "sheet"
-  },
-  "fig:skaraan": {
-   "rect": [
-    256,
-    256,
-    384,
-    384
-   ],
-   "sheet": "sheet"
-  },
-  "fig:skaraan_chief": {
-   "rect": [
-    512,
-    256,
-    640,
-    384
-   ],
-   "sheet": "sheet"
-  },
-  "fig:skaraan_young": {
-   "rect": [
-    384,
-    256,
-    512,
     384
    ],
    "sheet": "sheet"

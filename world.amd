@@ -526,7 +526,7 @@ Talk scene: crowd
 ---
 Area: colony
 At: 31, 21
-Sprite: fig:skaraan_young
+Sprite: fig:reptile_young
 Calm: yes
 HP: 2
 Damage: 0
@@ -559,7 +559,7 @@ Talk scene: brandt
 ---
 Area: gnaw
 Mark: vhesk_seat
-Sprite: fig:skaraan_chief
+Sprite: fig:reptile_chief
 Calm: yes
 HP: 6
 Damage: 2
@@ -570,7 +570,7 @@ Talk scene: vhesk
 ---
 Area: flats
 Mark: sentry_post
-Sprite: fig:skaraan
+Sprite: fig:reptile
 HP: 3
 Damage: 1
 Notice: 5
@@ -582,7 +582,7 @@ Talk scene: sentry
 ---
 Area: flats
 At: 26, 5
-Sprite: fig:skaraan
+Sprite: fig:reptile
 HP: 3
 Damage: 1
 Notice: 5
@@ -595,7 +595,7 @@ Talk scene: sentry
 ---
 Area: gnaw
 At: 12, 8
-Sprite: fig:skaraan
+Sprite: fig:reptile
 Calm: yes
 HP: 3
 Damage: 1

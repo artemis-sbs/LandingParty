@@ -17,7 +17,7 @@ Kinds used: `glyph`, `evidence`, `marker`, `flag`. `lp flag <name>` is a one-off
 from sbs_utils.agent import Agent
 
 # WHAT THINGS LOOK LIKE is not decided here. The mission names shared keys - `fig:crew_eva`,
-# `fig:skaraan_chief`, `prop:hauler`, ground looks like `dirt` - and an ART SET draws them: the mission's own `builtin` set
+# `fig:reptile_chief`, `prop:hauler`, ground looks like `dirt` - and an ART SET draws them: the mission's own `builtin` set
 # (media/tileart/builtin, made by `_tools/make_tiles.py`) and then whatever the TILE_ART
 # setting names, found in this mission or in a pinned media pack. A pack can redraw any
 # of it; one that is missing just leaves the builtin art. See sbs_utils tilemap_art.py.
