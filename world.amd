@@ -494,6 +494,7 @@ sentries start hostile and CAN be talked down.
 Area: colony
 At: 10, 14
 Sprite: fig:captain_f
+Face: ter #6b3a20 1 0;ter #fff 23 6;ter #6b3a20 12 1;ter #6b3a20 4 2;ter #fff 11 3;
 Calm: yes
 HP: 3
 Damage: 0
@@ -505,6 +506,7 @@ Talk scene: oyelaran
 Area: colony
 At: 28, 21
 Sprite: fig:junker_m
+Face: ter #008eff 0 0;ter #fff 6 6;ter #008eff 10 1;ter #008eff 11 2;ter #4c057b 11 4;ter #4c057b 0 3;ter #fff 8 5;
 Calm: yes
 HP: 3
 Damage: 0
@@ -538,6 +540,7 @@ Talk scene: yilla
 Area: caves
 At: 5, 4
 Sprite: fig:crew_f
+Face: ter #7ac4ff 1 0;ter #fff 7 6;ter #7ac4ff 5 1;ter #7ac4ff 4 2;ter #37227a 18 3;
 Calm: yes
 HP: 1
 Damage: 0
@@ -549,6 +552,7 @@ Talk scene: castellan
 Area: caves
 At: 6, 3
 Sprite: fig:medic_m
+Face: ter #ca874c 0 0;ter #fff 17 6;ter #ca874c 4 1;ter #ca874c 12 2;ter #968b00 10 4;ter #968b00 3 3;ter #fff 0 5;
 Calm: yes
 HP: 2
 Damage: 0

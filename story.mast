@@ -220,6 +220,20 @@ Defaults:
             lp_probe_at = tilemap_entry(lp_probe_area)
         for lp_go_cid in sorted(linked_to(lp_go_ship, "consoles")):
             tilemap_place(boarding_me(lp_go_cid), lp_probe_area, lp_probe_at[0], lp_probe_at[1])
+    # Development only (`var.LP_PROBE_TALK=oyelaran`): every console talks to that person,
+    # and a while later the first console takes its first choice by its real words - an
+    # engine check of the Act transcript's faces that needs no mouse.
+    lp_probe_talk = SETTINGS.get("LP_PROBE_TALK", "")
+    if lp_probe_talk:
+        await delay_sim(4)
+        for lp_go_cid in sorted(linked_to(lp_go_ship, "consoles")):
+            boarding_talk(lp_go_cid, lp_probe_talk)
+        await delay_sim(8)
+        lp_probe_cids = [c for c in sorted(linked_to(lp_go_ship, "consoles")) if boarding_me(c) is not None]
+        if len(lp_probe_cids) > 0:
+            lp_probe_first = boarding_choices(lp_probe_cids[0])
+            if len(lp_probe_first) > 0:
+                signal_emit("boarding_pick", {"SIGNAL_CLIENT_ID": lp_probe_cids[0], "i": "0", "seq": str(boarding_seq_for(lp_probe_cids[0])), "SIGNAL_CHOICE": amd_choice_label(lp_probe_first[0].get("label"))})
     ->END if not SETTINGS.get("LP_PROBE_PICK", 0)
     # Development only (`var.LP_PROBE_PICK=1`): open the drone's scene and, a while
     # later, pick its first choice through the same signal the button sends - an engine
