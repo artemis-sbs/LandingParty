@@ -859,7 +859,7 @@ def draw_cell(name):
 VARIANTS = {"dust": 3, "scrub": 3, "salt": 3, "path": 2, "floor": 2, "cave": 3,
             "rock": 3, "brine": 2}
 
-#: The shared ground LOOK names (what the mission's kinds wear, see lp_world.lp_kinds)
+#: The shared ground LOOK names (what the mission's kinds wear, see surface/mereth.tileset)
 #: -> the drawing that stands in for each in this builtin set.
 GROUND_LOOKS = {
     "dirt": "dust", "dirt_grass": "scrub", "salt": "salt", "sand_pale": "path",

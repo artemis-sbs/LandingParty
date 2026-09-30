@@ -1,0 +1,25 @@
+# Mereth's ground: what each tile kind in the area files can be walked and seen across,
+# and which shared ground LOOK an art set draws it with (see sbs_utils tilemap_art.py).
+# A kind you can see across but not walk (brine, a cliff edge) is what makes a map
+# readable: the far bank is visible, getting there is the puzzle.
+tileset: mereth
+title: Mereth surface
+kinds:
+  dust:        walk see   look=dirt
+  scrub:       walk see   look=dirt_grass
+  salt:        walk see   look=salt
+  path:        walk see   look=sand_pale
+  floor:       walk see   look=floor_metal
+  deck:        walk see   look=floor_grate
+  cave:        walk see   look=rock_floor
+  glyphfloor:  walk see   look=stone_tiles
+  vent:        walk see   look=vent
+  rock:                   look=rock
+  cliff:            see   look=cliff
+  brine:            see   look=water
+  crystal:                look=crystal
+  wall:                   look=wall_metal
+  pwall:                  look=wall_ancient
+  hull:                   look=hull_metal
+  # A way out, drawn as one: bright chevrons, so nobody has to guess where it is.
+  exit:        walk see   look=exit

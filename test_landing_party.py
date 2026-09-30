@@ -94,7 +94,7 @@ class World(unittest.TestCase):
         L.lp_reset()
         L.lp_install()
         A.boarding_metric_install()
-        L.lp_setup_tiles()
+        L.lp_setup_tiles(read=_read)
         self.assertEqual(L.lp_load_areas(read=lambda p: _read(p)), 6)
         self.world = amd_document(_read("world.amd"), data_parser=amd_mission_data)
         scenes_doc = amd_document(_read("scenes.amd"), data_parser=amd_mission_data)
@@ -246,7 +246,7 @@ class TestTheContentResolves(World):
     def test_without_the_pack_the_builtin_art_draws_it_all(self):
         from sbs_utils.procedural.tilemap_art import tilemap_art_origin, tilemap_art_clear
         tilemap_art_clear()
-        L.lp_setup_tiles("builtin")
+        L.lp_setup_tiles("builtin", read=_read)
         self.assertEqual(tilemap_art_origin("fig:crew_eva"), "builtin")
         for kind, spec in T._TILESETS["mereth"].items():
             self.assertTrue(spec.get("cell"), f"tile kind {kind} has no art")

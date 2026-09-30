@@ -22,34 +22,9 @@ from sbs_utils.agent import Agent
 # setting names, found in this mission or in a pinned media pack. A pack can redraw any
 # of it; one that is missing just leaves the builtin art. See sbs_utils tilemap_art.py.
 
-# kind -> (walk, see). A kind you can see across but not walk (brine, a cliff edge) is
-# what makes a map readable: the far bank is visible, getting there is the puzzle.
-_KINDS = {
-    # kind:        (walk,  see,   the shared ground LOOK an art set draws it with)
-    "dust":        (True,  True,  "dirt"),
-    "scrub":       (True,  True,  "dirt_grass"),
-    "salt":        (True,  True,  "salt"),
-    "path":        (True,  True,  "sand_pale"),
-    "floor":       (True,  True,  "floor_metal"),
-    "deck":        (True,  True,  "floor_grate"),
-    "cave":        (True,  True,  "rock_floor"),
-    "glyphfloor":  (True,  True,  "stone_tiles"),
-    "vent":        (True,  True,  "vent"),
-    "rock":        (False, False, "rock"),
-    "cliff":       (False, True,  "cliff"),
-    "brine":       (False, True,  "water"),
-    "crystal":     (False, False, "crystal"),
-    "wall":        (False, False, "wall_metal"),
-    "pwall":       (False, False, "wall_ancient"),
-    "hull":        (False, False, "hull_metal"),
-    # A way out, drawn as one: bright chevrons, so nobody has to guess where it is.
-    "exit":        (True,  True,  "exit"),
-}
-
-
-def lp_kinds():
-    """The tileset: Mereth's RULES (walk, see) and which shared ground each kind wears."""
-    return {k: {"walk": w, "see": s, "look": look} for k, (w, s, look) in _KINDS.items()}
+# The tileset - which kinds can be walked and seen across, and the ground LOOK each one
+# wears - is DATA, in surface/mereth.tileset, where the linter and the tile editor read it.
+LP_TILESET = "surface/mereth.tileset"
 
 
 LP_AREAS = ["ridge", "colony", "flats", "caves", "lantern", "gnaw"]
@@ -59,20 +34,23 @@ LP_SHIP_LIFT = 60      # what the bridge alone can beam out before the dawn
 _STATE = {"tally": {}, "ending": None}
 
 
-def lp_setup_tiles(*sets):
+def lp_setup_tiles(*sets, read=None):
     """Declare the tileset's rules and load the art. Call once, before loading areas.
 
     Args:
         *sets: art sets to load, in order. Default: `builtin` plus the TILE_ART setting.
+        read: reads a mission file by relative path (tests pass their own).
     """
-    from sbs_utils.procedural.tilemap import tilemap_tileset
+    from sbs_utils.procedural.tilemap import tilemap_tileset_load
     from sbs_utils.procedural.tilemap_art import tilemap_art_use
     from sbs_utils.procedural.boarding_tiles import boarding_tile_style
     from sbs_utils.procedural.boarding_combat import boarding_drop_sprite
     from sbs_utils.procedural.boarding_hints import boarding_hint_style
+    if read is None:
+        from sbs_utils.procedural.media import media_read_relative_file as read
     # The RULES are the mission's; the looks come from the art sets.
-    tilemap_tileset("mereth", lp_kinds())
-    loaded = tilemap_art_use(*sets, tileset="mereth")
+    tileset = tilemap_tileset_load(read(LP_TILESET))       # None: logged, and no ground art
+    loaded = tilemap_art_use(*sets, tileset=tileset)
     # Badges over what is still worth a look: untouched, a quest lead, a new place.
     boarding_hint_style(new="ui:hint_new", lead="ui:hint_lead", way="ui:hint_way")
     boarding_tile_style(sprite="fig:crew_eva",

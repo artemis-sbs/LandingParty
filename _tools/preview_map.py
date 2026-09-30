@@ -124,7 +124,7 @@ def main():
     import lp_world as L
     names = ["builtin"] + [a.strip() for a in args.art.split(",") if a.strip()]
     sprites, ground = load_sets(names)
-    T.tilemap_tileset("mereth", L.lp_kinds())
+    T.tilemap_tileset_load(open(os.path.join(ROOT, L.LP_TILESET), encoding="utf-8").read())
     tilemap_art_ground("mereth", ground)
     T.tilemap_load(open(os.path.join(ROOT, "surface", args.area + ".tiles"),
                         encoding="utf-8").read())
