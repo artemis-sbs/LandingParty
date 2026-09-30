@@ -3,3 +3,6 @@
 
 # The probe report the mission writes on every run - generated, not source.
 landing.txt
+
+# The standalone site from `sbs site --emit site` - build output, not source.
+__site__/
