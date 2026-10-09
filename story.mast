@@ -8,9 +8,13 @@
 # and the people you can talk to are `world.amd`, every word said is `scenes.amd`, and the
 # mission's own vocabulary is `lp_world.py`. This script builds the world, runs the clock,
 # connects the bridge to the ground, and decides when it is over.
+#
+# The ground itself is the library's: `boarding_ground_load` loads it and `boarding_visit`
+# runs the visit, exactly as in the `away` starter (`sbs create <Name> -t away`). What is
+# Dawnline's own is the clock, the picket, the hails, the tally and the endings.
 
 
-# The mission's own vocabulary: tiles, the tally, the ending. Every function is `lp_`.
+# The mission's own vocabulary: the tally and the ending. Every function is `lp_`.
 import lp_world.py
 
 
@@ -54,33 +58,24 @@ Defaults:
     crew_load_amd("landing_crew.amd")
     shared CREW_SELECT = "landing_crew"
     lp_crew_doc = document_get_amd_file(get_mission_dir_filename("landing_crew.amd"))
-    boarding_skills_from_amd(lp_crew_doc)
 
     # A new game: nothing done yet.
     lp_reset()
     lp_install()
-    boarding_metric_install()
-    lp_setup_tiles()
-    lp_areas = lp_load_areas()
-    if lp_areas != 6:
-        print(f"LandingParty: only {lp_areas} of 6 areas loaded")
 
     lp_doc = document_get_amd_file(get_mission_dir_filename("world.amd"), data_parser=amd_mission_data)
     lp_scene_doc = document_get_amd_file(get_mission_dir_filename("scenes.amd"), data_parser=amd_mission_data)
-    shared LP_SCENES = dialogue_scenes(amd_section(lp_scene_doc, "scenes"))
     shared LP_HAILS = dialogue_scenes(amd_section(lp_doc, "hails"))
     shared LP_SIDE = amd_section(lp_doc, "side_stories")
 
-    # The ground: props, the people you can talk to, and what is out there hunting heat.
-    boarding_props_scenes(LP_SCENES)
-    boarding_props_declare(amd_section(lp_doc, "props"))
-    boarding_props_place()
-    boarding_hostiles_declare(amd_section(lp_doc, "people"))
-    boarding_hostiles_declare(amd_section(lp_doc, "hostiles"))
-    boarding_hostiles_place()
-    boarding_props_install()
-    boarding_combat_install()
-    tilemap_watch()
+    # THE GROUND, in one call: the tileset and the six areas under `surface/`, the art
+    # (the mission's own `builtin` set, then TILE_ART), the props, the people you can talk
+    # to and what is out there hunting heat from world.amd, the scenes they open from
+    # scenes.amd, and the crew's `Skills:`. Anything it could not place is named in
+    # mast.runtime.log.
+    lp_ground = boarding_ground_load([lp_doc, lp_scene_doc, lp_crew_doc])
+    if lp_ground.get("areas") != 6:
+        print(f"LandingParty: only {lp_ground.get('areas')} of 6 areas loaded")
 
     # The whole crew's story, on the game itself.
     lp_grant_story(amd_section(lp_doc, "quests"))
@@ -189,27 +184,35 @@ Defaults:
 
 # Open the party. Each console beams down from its ePADD as its own crew member, onto the
 # landing ridge; the crew console draws the ground as a tile map.
+#
+# `boarding_visit` with an `area` and no first room is a visit on a tile map: it opens the
+# party, hands each crew member their side story as they land (`stories=`), brings a party
+# that is all down round at the edge of the area, and stays open while people beam up and
+# come back. It is not ended by a scene closing - `lp_finish` ends it.
 //shared/signal/lp_beam_down
     ->END if boarding_invitation() is not None
     lp_ship = next(iter(role("__player__")), None)
     ->END if lp_ship is None
-    lp_invite = boarding_invite_crew(lp_ship, title="Stillwater", area="ridge")
+    # Development only: `var.LP_AUTO_GO=1` sends every console down without anyone
+    # pressing BEAM DOWN, so an engine run can look at the ground with no mouse. The
+    # sending is the library's BOARDING_AUTO_BEAM setting; this turns it on, BEFORE the
+    # visit opens, and starts the probes below.
+    if SETTINGS.get("LP_AUTO_GO", 0):
+        settings_get_defaults().update({"BOARDING_AUTO_BEAM": True})
+    lp_invite = boarding_visit(lp_ship, boarding_ground_scenes(), title="Stillwater", area="ridge", stories=LP_SIDE)
+    ->END if lp_invite is None
     if len(lp_invite.get("roster") or []) == 0:
         print("LandingParty: no crew at the consoles to send down")
     task_schedule(lp_dawn_clock)
     log(f"beam down: roster={len(lp_invite.get('roster') or [])}", "landing")
-    # Development only: send every console down without anyone pressing BEAM DOWN, so an
-    # engine run can look at the ground with no mouse. `var.LP_AUTO_GO=1`.
     if SETTINGS.get("LP_AUTO_GO", 0):
         task_schedule(lp_auto_go, {"lp_go_ship": lp_ship})
     ->END
 
 
 === lp_auto_go
-    await delay_sim(2)
-    for lp_go_cid in sorted(linked_to(lp_go_ship, "consoles")):
-        if boarding_beam_down(lp_go_cid) is not None:
-            boarding_go_down(lp_go_cid)
+    # The visit's own tick has sent the consoles down by now (BOARDING_AUTO_BEAM).
+    await delay_sim(3)
     # Development only (`var.LP_PROBE_AREA=gnaw`, optionally `var.LP_PROBE_AT=13,4`):
     # stand everyone in another area, so an engine run can look at it with no mouse.
     lp_probe_area = SETTINGS.get("LP_PROBE_AREA", "")
@@ -249,13 +252,6 @@ Defaults:
     ->END
 
 
-# Each crew member picks up their own side story when they land.
-//shared/signal/boarding_went_down
-    ->END if LP_SIDE is None
-    boarding_quests_grant(LP_SIDE)
-    ->END
-
-
 //shared/signal/lp_met_magistrate
     lp_reveal_ways()
     # Anyone who has not claimed their side story by now is not coming.
@@ -272,18 +268,11 @@ Defaults:
     ->END
 
 
-# Everyone on the ground is down. Nobody is stranded: they come round at the edge of the
-# area, away from what dropped them - and the night is two minutes shorter.
-//shared/signal/boarding_party_down
+# Everyone on the ground was down. Nobody is stranded: the visit brings them round at the
+# edge of the area, away from what dropped them (the library does that, eight seconds
+# on) - and what it costs is Dawnline's to say: the night is two minutes shorter.
+//shared/signal/boarding_party_revived
     ->END if LP_OVER
-    await delay_sim(8)
-    for lp_down in boarding_team():
-        if boarding_is_down(lp_down):
-            lp_down_at = tilemap_where(lp_down)
-            boarding_revive(lp_down, 1)
-            if lp_down_at is not None:
-                lp_entry = tilemap_entry(lp_down_at[0])
-                tilemap_place(lp_down, lp_down_at[0], lp_entry[0], lp_entry[1])
     LP_DAWN_LEFT = max(60, LP_DAWN_LEFT - 120)
     message_send("You come to at the edge of the site, bruised. Two minutes of night are gone.", to="boarding", kind="alert", sender="Stillwater")
     ->END
@@ -323,6 +312,9 @@ Defaults:
     signal_emit("lp_saved")
     log(f"finish: {lp_end[0]} saved={lp_end[3]} lantern={lp_end[4]} glyphs={lp_end[5]} sides={lp_end[6]}", "landing")
     await delay_sim(4)
+    # The visit is over: the party is shut and every console is back at its station
+    # before the results go up.
+    boarding_visit_end()
     START_TEXT = lp_ending_text()
     if lp_end[3] > 100:
         music_play_sting("victory")

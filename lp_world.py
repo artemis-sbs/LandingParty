@@ -1,9 +1,9 @@
 """Dawnline - the mission's own vocabulary on top of the library's ground layer.
 
-Everything generic (tile areas, walking, props, checks, hostiles, quests, the xESS) is
-sbs_utils. This file is only what is Mereth's: the tileset, the story's running tally,
-and how the ending is decided. Every public function is prefixed `lp_` - they become
-MAST globals in one flat, mission-wide namespace.
+Everything generic (tile areas, walking, props, checks, hostiles, quests, the xESS, and
+LOADING all of it - `boarding_ground_load`) is sbs_utils. This file is only what is
+Mereth's: the story's running tally, and how the ending is decided. Every public function
+is prefixed `lp_` - they become MAST globals in one flat, mission-wide namespace.
 
 THE TALLY. Scenes record what the party has done with the `lp` outcome verb and ask
 about it with the `lp` guard word, so the story state lives in the AMD rather than in a
@@ -23,52 +23,15 @@ from sbs_utils.agent import Agent
 # of it; one that is missing just leaves the builtin art. See sbs_utils tilemap_art.py.
 
 # The tileset - which kinds can be walked and seen across, and the ground LOOK each one
-# wears - is DATA, in surface/mereth.tileset, where the linter and the tile editor read it.
-LP_TILESET = "surface/mereth.tileset"
+# wears - is DATA, in surface/mereth.tileset, and the six areas are surface/*.tiles. The
+# library finds and loads them (`boarding_ground_load`), with the art and the default
+# looks: the crew figure, the bag a fallen hostile leaves, the badges over what is still
+# worth a look. Nothing here names a file.
 
-
-LP_AREAS = ["ridge", "colony", "flats", "caves", "lantern", "gnaw"]
 LP_COLONISTS = 212
 LP_SHIP_LIFT = 60      # what the bridge alone can beam out before the dawn
 
 _STATE = {"tally": {}, "ending": None}
-
-
-def lp_setup_tiles(*sets, read=None):
-    """Declare the tileset's rules and load the art. Call once, before loading areas.
-
-    Args:
-        *sets: art sets to load, in order. Default: `builtin` plus the TILE_ART setting.
-        read: reads a mission file by relative path (tests pass their own).
-    """
-    from sbs_utils.procedural.tilemap import tilemap_tileset_load
-    from sbs_utils.procedural.tilemap_art import tilemap_art_use
-    from sbs_utils.procedural.boarding_tiles import boarding_tile_style
-    from sbs_utils.procedural.boarding_combat import boarding_drop_sprite
-    from sbs_utils.procedural.boarding_hints import boarding_hint_style
-    if read is None:
-        from sbs_utils.procedural.media import media_read_relative_file as read
-    # The RULES are the mission's; the looks come from the art sets.
-    tileset = tilemap_tileset_load(read(LP_TILESET))       # None: logged, and no ground art
-    loaded = tilemap_art_use(*sets, tileset=tileset)
-    # Badges over what is still worth a look: untouched, a quest lead, a new place.
-    boarding_hint_style(new="ui:hint_new", lead="ui:hint_lead", way="ui:hint_way")
-    boarding_tile_style(sprite="fig:crew_eva",
-                        colors=["#4cf", "#fc4", "#f66", "#8f8", "#c8f", "#fa8"])
-    boarding_drop_sprite("prop:bag")
-    return loaded
-
-
-def lp_load_areas(read=None):
-    """Load every area file. Returns how many loaded - six, or something is wrong."""
-    from sbs_utils.procedural.tilemap import tilemap_load
-    if read is None:
-        from sbs_utils.procedural.media import media_read_relative_file as read
-    n = 0
-    for key in LP_AREAS:
-        if tilemap_load(read("surface/%s.tiles" % key)):
-            n += 1
-    return n
 
 
 # --- the tally -------------------------------------------------------------------------
@@ -150,10 +113,10 @@ def _lp_quest_signal(name, data):
             lp_flag("road_clear")
         return
     if name == "lp_power" and not lp_is("powered"):
-        from sbs_utils.procedural.boarding_props import boarding_props_signal
+        # The Lantern's door `Opens with: signal lp_power` in world.amd, and the library
+        # hears that itself. What is left here is Dawnline's: the fact, and the words.
         from sbs_utils.procedural.messages import message_send
         lp_flag("powered")
-        boarding_props_signal("lp_power")
         message_send("Power from orbit. The Lantern is awake and waiting at its control.",
                      to="boarding", kind="alert", sender="The Lantern")
     from sbs_utils.procedural.quest_driver import quest_on_signal

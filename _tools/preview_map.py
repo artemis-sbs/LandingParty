@@ -121,10 +121,9 @@ def main():
 
     from sbs_utils.procedural import tilemap as T
     from sbs_utils.procedural.tilemap_art import tilemap_art_ground
-    import lp_world as L
     names = ["builtin"] + [a.strip() for a in args.art.split(",") if a.strip()]
     sprites, ground = load_sets(names)
-    T.tilemap_tileset_load(open(os.path.join(ROOT, L.LP_TILESET), encoding="utf-8").read())
+    T.tilemap_tileset_load(open(os.path.join(ROOT, "surface", "mereth.tileset"), encoding="utf-8").read())
     tilemap_art_ground("mereth", ground)
     T.tilemap_load(open(os.path.join(ROOT, "surface", args.area + ".tiles"),
                         encoding="utf-8").read())

@@ -40,6 +40,7 @@ from sbs_utils.procedural import boarding_props as P
 from sbs_utils.procedural import boarding_checks as C
 from sbs_utils.procedural import boarding_combat as K
 from sbs_utils.procedural import boarding_quests as Q
+from sbs_utils.procedural import boarding_ground as BG
 from sbs_utils.procedural.amd_dialogue import dialogue_scenes, dialogue_parse
 from sbs_utils.procedural.amd_doc import amd_document, amd_section
 from sbs_utils.procedural.amd_mission import amd_mission_data
@@ -93,23 +94,19 @@ class World(unittest.TestCase):
 
         L.lp_reset()
         L.lp_install()
-        A.boarding_metric_install()
-        L.lp_setup_tiles(read=_read)
-        self.assertEqual(L.lp_load_areas(read=lambda p: _read(p)), 6)
         self.world = amd_document(_read("world.amd"), data_parser=amd_mission_data)
         scenes_doc = amd_document(_read("scenes.amd"), data_parser=amd_mission_data)
-        self.scenes = dialogue_scenes(amd_section(scenes_doc, "scenes"))
         self.hails = dialogue_scenes(amd_section(self.world, "hails"))
-        P.boarding_props_scenes(self.scenes)
-        P.boarding_props_declare(amd_section(self.world, "props"))
-        P.boarding_props_place()
-        K.boarding_hostiles_declare(amd_section(self.world, "people"))
-        K.boarding_hostiles_declare(amd_section(self.world, "hostiles"))
-        K.boarding_hostiles_place()
-        P.boarding_props_install()
-        K.boarding_combat_install()
+        # THE SAME CALL story.mast makes: the tileset and the areas under surface/, the
+        # art, the props, people and hostiles, the scenes they open and the crew's skills.
+        BG.boarding_ground_clear()
+        self.addCleanup(BG.boarding_ground_clear)
+        self.ground = BG.boarding_ground_load(
+            [self.world, scenes_doc, amd_document(_read("landing_crew.amd"))], folder=HERE)
+        self.assertEqual(self.ground["areas"], 6)
+        self.assertEqual(self.ground["unplaced"], [])
+        self.scenes = BG.boarding_ground_scenes()
         C.boarding_checks_mode("flat")
-        C.boarding_skills_from_amd(amd_document(_read("landing_crew.amd")))
 
         ship = lifeform_spawn("Artemis", "", "x")
         A.boarding_invite(ship, [], title="Stillwater", area="ridge")
@@ -245,8 +242,9 @@ class TestTheContentResolves(World):
 
     def test_without_the_pack_the_builtin_art_draws_it_all(self):
         from sbs_utils.procedural.tilemap_art import tilemap_art_origin, tilemap_art_clear
+        from sbs_utils.procedural.tilemap_art import tilemap_art_use
         tilemap_art_clear()
-        L.lp_setup_tiles("builtin", read=_read)
+        tilemap_art_use("builtin", tileset="mereth")
         self.assertEqual(tilemap_art_origin("fig:crew_eva"), "builtin")
         for kind, spec in T._TILESETS["mereth"].items():
             self.assertTrue(spec.get("cell"), f"tile kind {kind} has no art")
